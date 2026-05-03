@@ -98,6 +98,18 @@ def create_app(config=None):
     def index():
         return redirect(url_for('anak.dashboard'))
 
+    # ── Route sementara: init admin (HAPUS setelah dipakai!) ──────────────────
+    @app.route('/init-admin-rahasia-hapus-ini')
+    def init_admin():
+        from models import User
+        if User.query.filter_by(username='admin').first():
+            return 'User admin sudah ada. Silakan login.'
+        admin = User(username='admin', nama_lengkap='Administrator', role='admin')
+        admin.set_password('Admin123!')
+        db.session.add(admin)
+        db.session.commit()
+        return 'Admin berhasil dibuat! Username: admin | Password: Admin123! — SEGERA HAPUS ROUTE INI!'
+
     # ── Buat tabel database ────────────────────────────────────────────────────
     with app.app_context():
         try:
