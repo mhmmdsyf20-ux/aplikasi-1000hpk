@@ -98,23 +98,12 @@ def create_app(config=None):
     def index():
         return redirect(url_for('anak.dashboard'))
 
-    # ── Route sementara: init admin (HAPUS setelah dipakai!) ──────────────────
-    @app.route('/init-admin-rahasia-hapus-ini')
-    def init_admin():
-        from models import User
-        if User.query.filter_by(username='admin').first():
-            return 'User admin sudah ada. Silakan login.'
-        admin = User(username='admin', nama_lengkap='Administrator', role='admin')
-        admin.set_password('Admin123!')
-        db.session.add(admin)
-        db.session.commit()
-        return 'Admin berhasil dibuat! Username: admin | Password: Admin123! — SEGERA HAPUS ROUTE INI!'
-
-    # ── Buat tabel database ────────────────────────────────────────────────────
+    # ── Buat tabel database & seed admin pertama ───────────────────────────────
     with app.app_context():
         try:
             db.create_all()
             app.logger.info("Database tables created/verified successfully.")
+            _seed_admin()
         except Exception as e:
             _handle_db_error(e)
 
@@ -158,6 +147,29 @@ def _handle_db_error(e: Exception):
     # sys.exit dihapus agar Railway tidak restart loop
     import os
     logging.error("Aplikasi tetap berjalan meski DB gagal — periksa konfigurasi.")
+
+
+def _seed_admin():
+    """
+    Buat user admin default jika belum ada satu pun user di database.
+    Kredensial diambil dari environment variable ADMIN_USERNAME dan ADMIN_PASSWORD.
+    Fallback ke 'admin' / 'Admin123!' jika tidak di-set.
+    """
+    import os
+    from models import User
+
+    if User.query.first():
+        return  # Sudah ada user, skip seeding
+
+    username = os.environ.get("ADMIN_USERNAME", "admin")
+    password = os.environ.get("ADMIN_PASSWORD", "Admin123!")
+    nama     = os.environ.get("ADMIN_NAMA", "Administrator")
+
+    admin = User(username=username, nama_lengkap=nama, role='admin')
+    admin.set_password(password)
+    db.session.add(admin)
+    db.session.commit()
+    logging.info(f"Admin default '{username}' berhasil dibuat.")
 
 
 if __name__ == "__main__":
