@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard</title>
+</head>
+<body>
+
+<h2>Status Imunisasi Anak</h2>
+
+<table>
+<tr>
+    <th>Nama</th>
+    <th>Umur (hari)</th>
+    <th>Status</th>
+</tr>
+
+{% for d in data %}
+<tr>
+    <td>{{ d.nama }}</td>
+    <td>{{ d.umur }}</td>
+    <td>{{ d.status }}</td>
+</tr>
+{% endfor %}
+
+</table>
+
+<script src="/static/script.js"></script>
+
+</body>
+</html>

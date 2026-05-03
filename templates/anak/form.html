@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% block title %}{% if mode == 'edit' %}Edit Data Anak{% else %}Tambah Anak Baru{% endif %}{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="fw-bold mb-0">
+        {% if mode == 'edit' %}
+        <i class="bi bi-pencil-square me-2 text-primary"></i>Edit Data Anak
+        {% else %}
+        <i class="bi bi-person-plus-fill me-2 text-primary"></i>Tambah Anak Baru
+        {% endif %}
+    </h4>
+    <a href="{{ url_for('anak.list_anak') }}" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left me-1"></i>Kembali
+    </a>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-body p-4">
+        <form method="POST"
+              action="{% if mode == 'edit' %}{{ url_for('anak.edit_anak', anak_id=anak.id) }}{% else %}{{ url_for('anak.tambah_anak') }}{% endif %}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label for="nama" class="form-label fw-semibold">Nama Lengkap Anak <span class="text-danger">*</span></label>
+                    <input type="text" id="nama" name="nama" class="form-control"
+                           value="{{ data.get('nama', '') }}" placeholder="Masukkan nama lengkap anak" required>
+                </div>
+                <div class="col-md-6">
+                    <label for="tanggal_lahir" class="form-label fw-semibold">Tanggal Lahir <span class="text-danger">*</span></label>
+                    <input type="date" id="tanggal_lahir" name="tanggal_lahir" class="form-control"
+                           value="{{ data.get('tanggal_lahir', '') }}" required>
+                </div>
+                <div class="col-md-6">
+                    <label for="jenis_kelamin" class="form-label fw-semibold">Jenis Kelamin <span class="text-danger">*</span></label>
+                    <select id="jenis_kelamin" name="jenis_kelamin" class="form-select" required>
+                        <option value="">-- Pilih Jenis Kelamin --</option>
+                        <option value="L" {% if data.get('jenis_kelamin') == 'L' %}selected{% endif %}>Laki-laki</option>
+                        <option value="P" {% if data.get('jenis_kelamin') == 'P' %}selected{% endif %}>Perempuan</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label for="nama_ibu" class="form-label fw-semibold">Nama Ibu <span class="text-danger">*</span></label>
+                    <input type="text" id="nama_ibu" name="nama_ibu" class="form-control"
+                           value="{{ data.get('nama_ibu', '') }}" placeholder="Masukkan nama ibu kandung" required>
+                </div>
+                <div class="col-md-6">
+                    <label for="no_hp_ortu" class="form-label fw-semibold">Nomor HP Orang Tua <span class="text-danger">*</span></label>
+                    <input type="tel" id="no_hp_ortu" name="no_hp_ortu" class="form-control"
+                           value="{{ data.get('no_hp_ortu', '') }}"
+                           placeholder="Contoh: 08123456789 atau +6281234567890"
+                           pattern="^(\+62|08)\d{8,13}$" required>
+                    <div class="form-text">Format: 08xx atau +62xx (10–15 digit)</div>
+                </div>
+                <div class="col-md-6">
+                    <label for="alamat" class="form-label fw-semibold">Alamat</label>
+                    <textarea id="alamat" name="alamat" class="form-control" rows="2"
+                              placeholder="Alamat tempat tinggal (opsional)">{{ data.get('alamat', '') }}</textarea>
+                </div>
+                <div class="col-md-6">
+                    <label for="berat_lahir" class="form-label fw-semibold">Berat Lahir (gram)</label>
+                    <input type="number" id="berat_lahir" name="berat_lahir" class="form-control"
+                           value="{{ data.get('berat_lahir', '') }}" placeholder="Contoh: 3200" min="500" max="6000">
+                </div>
+                <div class="col-md-6">
+                    <label for="panjang_lahir" class="form-label fw-semibold">Panjang Lahir (cm)</label>
+                    <input type="number" id="panjang_lahir" name="panjang_lahir" class="form-control"
+                           value="{{ data.get('panjang_lahir', '') }}" placeholder="Contoh: 50" min="30" max="70" step="0.1">
+                </div>
+            </div>
+            <hr class="my-4">
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-save me-1"></i>
+                    {% if mode == 'edit' %}Simpan Perubahan{% else %}Simpan Data Anak{% endif %}
+                </button>
+                <a href="{{ url_for('anak.list_anak') }}" class="btn btn-outline-secondary">Batal</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
