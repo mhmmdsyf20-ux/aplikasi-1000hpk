@@ -98,14 +98,19 @@ def create_app(config=None):
     def index():
         return redirect(url_for('anak.dashboard'))
 
-    # ── Buat tabel database & seed admin pertama ───────────────────────────────
-    with app.app_context():
-        try:
-            db.create_all()
-            app.logger.info("Database tables created/verified successfully.")
-            _seed_admin()
-        except Exception as e:
-            _handle_db_error(e)
+    # ── Inisialisasi DB dilakukan lazy (saat request pertama) ─────────────────
+    _db_initialized = {'done': False}
+
+    @app.before_request
+    def init_db_once():
+        if not _db_initialized['done']:
+            _db_initialized['done'] = True
+            try:
+                db.create_all()
+                app.logger.info("Database tables created/verified successfully.")
+                _seed_admin()
+            except Exception as e:
+                _handle_db_error(e)
 
     return app
 
