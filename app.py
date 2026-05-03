@@ -142,10 +142,10 @@ def _handle_db_error(e: Exception):
     logging.error("Periksa konfigurasi di file .env dan pastikan MySQL berjalan.")
     logging.error("=" * 60)
 
-    # Hentikan aplikasi jika bukan mode testing
+    # Log error tapi jangan hentikan aplikasi
+    # sys.exit dihapus agar Railway tidak restart loop
     import os
-    if not os.environ.get("FLASK_TESTING"):
-        sys.exit(1)
+    logging.error("Aplikasi tetap berjalan meski DB gagal — periksa konfigurasi.")
 
 
 if __name__ == "__main__":
