@@ -46,31 +46,13 @@ endblock %} {% block content %}
           >Role <span class="text-danger">*</span></label
         >
         <select name="role" class="form-select" required>
-          <option
-            value="petugas"
-            {%
-            if
-            user.role=""
-            ="petugas"
-            %}selected{%
-            endif
-            %}
-          >
+          <option value="petugas" {% if user.role == "petugas" %}selected{% endif %}>
             Petugas
           </option>
-          <option
-            value="admin"
-            {%
-            if
-            user.role=""
-            ="admin"
-            %}selected{%
-            endif
-            %}
-          >
+          <option value="admin" {% if user.role == "admin" %}selected{% endif %}>
             Admin
           </option>
-          <option value="user" {% if user.role="" ="user" %}selected{% endif %}>
+          <option value="user" {% if user.role == "user" %}selected{% endif %}>
             Ibu
           </option>
         </select>
