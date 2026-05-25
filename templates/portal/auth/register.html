@@ -1,9 +1,6 @@
 {% extends "portal/base.html" %} {% block title %}Daftar Akun{% endblock %} {%
 block extra_head %}
 <style>
-  body {
-    background: linear-gradient(135deg, #fff5f8 0%, #fff0f6 70%, #fdf2f8 100%);
-  }
   .register-wrapper {
     min-height: calc(100vh - 56px - 56px);
     display: flex;
@@ -15,8 +12,11 @@ block extra_head %}
     max-width: 480px;
     width: 100%;
     border-radius: 1.25rem;
-    border: 1px solid rgba(249, 208, 238, 0.8);
-    background: rgba(255, 255, 255, 0.96);
+    border: 1px solid rgba(255,255,255,0.25) !important;
+    background: rgba(255,255,255,0.15) !important;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    box-shadow: 0 25px 60px rgba(0,0,0,0.2);
   }
   .register-icon {
     width: 64px;
@@ -27,28 +27,32 @@ block extra_head %}
     align-items: center;
     justify-content: center;
   }
-  .btn-primary {
-    background: linear-gradient(135deg, #ec4899, #f472b6);
-    border: none;
+  .register-card h5, .register-card label, .register-card p,
+  .register-card .form-label, .register-card .card-body {
+    color: #fff !important;
   }
-  .btn-primary:hover {
-    background: linear-gradient(135deg, #db2777, #ec4899);
+  .register-card .text-muted { color: rgba(255,255,255,0.7) !important; }
+  .register-card .form-control,
+  .register-card .form-select {
+    background-color: rgba(255,255,255,0.15);
+    border-color: rgba(255,255,255,0.25);
+    color: #fff;
   }
-  .form-control,
-  .form-select {
-    background-color: #fff5fb;
-    border-color: rgba(249, 208, 238, 0.9);
-    color: #0f172a;
+  .register-card .form-control::placeholder { color: rgba(255,255,255,0.5); }
+  .register-card .form-control:focus,
+  .register-card .form-select:focus {
+    background-color: rgba(255,255,255,0.22);
+    border-color: rgba(255,255,255,0.6);
+    color: #fff;
+    box-shadow: 0 0 0 0.2rem rgba(255,255,255,0.15);
   }
-  .form-control:focus,
-  .form-select:focus {
-    background-color: #ffffff;
-    border-color: #ec4899;
-    box-shadow: 0 0 0 0.2rem rgba(236, 72, 153, 0.2);
+  .register-card .input-group-text {
+    background-color: rgba(255,255,255,0.15);
+    border-color: rgba(255,255,255,0.25);
+    color: rgba(255,255,255,0.8);
   }
-  .text-muted {
-    color: #64748b !important;
-  }
+  .register-card a { color: rgba(255,255,255,0.9); }
+  .register-card a:hover { color: #fff; }
 </style>
 {% endblock %} {% block content %}
 <div class="register-wrapper">
