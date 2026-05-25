@@ -28,7 +28,11 @@
                 <div class="col-md-6">
                     <label for="tanggal_lahir" class="form-label fw-semibold">Tanggal Lahir <span class="text-danger">*</span></label>
                     <input type="date" id="tanggal_lahir" name="tanggal_lahir" class="form-control"
-                           value="{{ data.get('tanggal_lahir', '') }}" required>
+                           value="{{ data.get('tanggal_lahir', '') }}"
+                           max="{{ today }}"
+                           min="{{ min_date }}"
+                           required>
+                    <div class="form-text">Aplikasi hanya untuk anak usia 0–2 tahun</div>
                 </div>
                 <div class="col-md-6">
                     <label for="jenis_kelamin" class="form-label fw-semibold">Jenis Kelamin <span class="text-danger">*</span></label>

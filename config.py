@@ -28,14 +28,16 @@ class Config:
 
     # Fallback ke manual config jika DATABASE_URL tidak ada
     if not _db_url:
-        DB_TYPE = os.environ.get("DB_TYPE", "postgresql")
+        DB_TYPE = os.environ.get("DB_TYPE", "mysql")
         DB_HOST = os.environ.get("DB_HOST", "localhost")
-        DB_PORT = os.environ.get("DB_PORT", "5432")
-        DB_USER = os.environ.get("DB_USER", "postgres")
+        DB_PORT = os.environ.get("DB_PORT", "3306")
+        DB_USER = os.environ.get("DB_USER", "root")
         DB_PASSWORD = os.environ.get("DB_PASSWORD", "")
-        DB_NAME = os.environ.get("DB_NAME", "hpk1000")
+        DB_NAME = os.environ.get("DB_NAME", "defaultdb")
+        DB_SSL = os.environ.get("DB_SSL", "false").lower() == "true"
         if DB_TYPE == "mysql":
-            _db_url = f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+            ssl_args = "?ssl_ca=/etc/ssl/certs/ca-certificates.crt" if DB_SSL else ""
+            _db_url = f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}{ssl_args}"
         else:
             _db_url = f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 
@@ -43,7 +45,7 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     # ── Session ────────────────────────────────────────────────────────────────
-    PERMANENT_SESSION_LIFETIME = timedelta(minutes=60)
+    PERMANENT_SESSION_LIFETIME = timedelta(hours=8)
 
     # ── CSRF ───────────────────────────────────────────────────────────────────
     WTF_CSRF_ENABLED = True
@@ -57,7 +59,7 @@ class Config:
     WA_SENDER = os.environ.get("WA_SENDER", "")
 
     # ── Identitas Fasilitas ────────────────────────────────────────────────────
-    NAMA_FASILITAS = os.environ.get("NAMA_FASILITAS", "Puskesmas")
+    NAMA_FASILITAS = os.environ.get("NAMA_FASILITAS", "Puskesmas Terdekat")
 
 
 class TestingConfig(Config):

@@ -22,6 +22,7 @@ from blueprints.auth import auth_bp
 from extensions import db
 from models import User
 from services.auth_service import authenticate_user, role_required
+from services.master_service import master_only
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -37,8 +38,10 @@ def login():
     POST — Validasi kredensial; jika valid login dan redirect ke dashboard,
            jika tidak tampilkan pesan error.
     """
-    # Jika sudah login, langsung ke dashboard
+    # Jika sudah login, langsung ke dashboard sesuai role
     if current_user.is_authenticated:
+        if current_user.role == 'user':
+            return redirect(url_for('portal.portal_dashboard'))
         return redirect(url_for('anak.dashboard'))
 
     if request.method == 'POST':
@@ -47,15 +50,17 @@ def login():
 
         user = authenticate_user(username, password)
         if user:
+            if user.role == 'user':
+                flash('Akun ibu hanya dapat login melalui Portal Ibu. Silakan gunakan halaman login portal.', 'warning')
+                return redirect(url_for('portal.portal_login'))
+
             # Aktifkan session permanent agar PERMANENT_SESSION_LIFETIME berlaku
             session.permanent = True
             login_user(user)
-            # Redirect ke halaman yang diminta sebelumnya (jika ada), atau dashboard
             next_page = request.args.get('next')
             try:
                 dashboard_url = url_for('anak.dashboard')
             except Exception:
-                # Blueprint anak belum diregistrasi (misal saat testing parsial)
                 dashboard_url = url_for('auth.admin_users')
             return redirect(next_page or dashboard_url)
         else:
@@ -65,7 +70,7 @@ def login():
 
 
 @auth_bp.route('/logout')
-@login_required
+@master_only
 def logout():
     """Hapus sesi login dan redirect ke halaman login."""
     logout_user()
@@ -78,7 +83,7 @@ def logout():
 # ─────────────────────────────────────────────────────────────────────────────
 
 @auth_bp.route('/admin/users', methods=['GET', 'POST'])
-@login_required
+@master_only
 @role_required('admin')
 def admin_users():
     """
@@ -99,8 +104,8 @@ def admin_users():
             errors.append('Username wajib diisi.')
         if not nama_lengkap:
             errors.append('Nama lengkap wajib diisi.')
-        if role not in ('admin', 'petugas'):
-            errors.append('Role harus admin atau petugas.')
+        if role not in ('admin', 'petugas', 'user'):
+            errors.append('Role harus admin, petugas, atau ibu.')
         if not password:
             errors.append('Password wajib diisi.')
 
@@ -128,7 +133,7 @@ def admin_users():
 
 
 @auth_bp.route('/admin/users/<int:user_id>/edit', methods=['GET', 'POST'])
-@login_required
+@master_only
 @role_required('admin')
 def admin_edit_user(user_id):
     """
@@ -149,8 +154,8 @@ def admin_edit_user(user_id):
         errors = []
         if not nama_lengkap:
             errors.append('Nama lengkap wajib diisi.')
-        if role not in ('admin', 'petugas'):
-            errors.append('Role harus admin atau petugas.')
+        if role not in ('admin', 'petugas', 'user'):
+            errors.append('Role harus admin, petugas, atau ibu.')
 
         if errors:
             for err in errors:
@@ -169,3 +174,21 @@ def admin_edit_user(user_id):
             return redirect(url_for('auth.admin_users'))
 
     return render_template('auth/user_form.html', user=user)
+
+
+@auth_bp.route('/admin/users/<int:user_id>/delete', methods=['POST'])
+@master_only
+@role_required('admin')
+def admin_delete_user(user_id):
+    """Hapus user dari sistem."""
+    user = User.query.get_or_404(user_id)
+
+    if user.id == current_user.id:
+        flash('Tidak dapat menghapus akun sendiri.', 'danger')
+        return redirect(url_for('auth.admin_users'))
+
+    username = user.username
+    db.session.delete(user)
+    db.session.commit()
+    flash(f'User "{username}" berhasil dihapus.', 'success')
+    return redirect(url_for('auth.admin_users'))

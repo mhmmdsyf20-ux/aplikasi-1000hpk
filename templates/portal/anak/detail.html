@@ -1,0 +1,91 @@
+{% extends "portal/base.html" %}
+
+{% block title %}{{ anak.nama }}{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
+    <div>
+        <h4 class="mb-0 fw-bold">
+            <i class="bi bi-person-fill me-2 text-primary"></i>Detail Anak
+        </h4>
+        <small class="text-muted">Informasi lengkap data anak</small>
+    </div>
+    <a href="{{ url_for('portal.portal_list_anak') }}" class="btn btn-outline-secondary btn-sm">
+        <i class="bi bi-arrow-left me-1"></i>Kembali ke Daftar Anak
+    </a>
+</div>
+
+<!-- Card Detail Anak -->
+<div class="card border-0 shadow-sm">
+    <div class="card-header bg-white border-bottom py-3 d-flex align-items-center justify-content-between flex-wrap gap-2">
+        <h5 class="mb-0 fw-semibold">
+            <i class="bi bi-person-vcard me-2 text-primary"></i>{{ anak.nama }}
+        </h5>
+        {% if anak.melewati_1000hpk %}
+        <span class="badge bg-danger fs-6 px-3 py-2">
+            <i class="bi bi-exclamation-triangle-fill me-1"></i>Melewati Periode 1000 HPK
+        </span>
+        {% endif %}
+    </div>
+
+    <div class="card-body">
+        <dl class="row mb-0">
+            <!-- Nama Lengkap -->
+            <dt class="col-sm-4 col-md-3 text-muted fw-normal">Nama Lengkap</dt>
+            <dd class="col-sm-8 col-md-9 fw-semibold">{{ anak.nama }}</dd>
+
+            <!-- Tanggal Lahir -->
+            <dt class="col-sm-4 col-md-3 text-muted fw-normal">Tanggal Lahir</dt>
+            <dd class="col-sm-8 col-md-9">{{ anak.tanggal_lahir.strftime('%d %B %Y') }}</dd>
+
+            <!-- Jenis Kelamin -->
+            <dt class="col-sm-4 col-md-3 text-muted fw-normal">Jenis Kelamin</dt>
+            <dd class="col-sm-8 col-md-9">
+                {% if anak.jenis_kelamin == 'L' %}
+                    <i class="bi bi-gender-male me-1 text-primary"></i>Laki-laki
+                {% else %}
+                    <i class="bi bi-gender-female me-1 text-danger"></i>Perempuan
+                {% endif %}
+            </dd>
+
+            <!-- Nama Ibu -->
+            <dt class="col-sm-4 col-md-3 text-muted fw-normal">Nama Ibu</dt>
+            <dd class="col-sm-8 col-md-9">{{ anak.nama_ibu }}</dd>
+
+            <!-- Umur -->
+            <dt class="col-sm-4 col-md-3 text-muted fw-normal">Umur</dt>
+            <dd class="col-sm-8 col-md-9">
+                {% set bulan = anak.umur_hari // 30 %}
+                {% set hari  = anak.umur_hari % 30 %}
+                {{ bulan }} bulan {{ hari }} hari
+            </dd>
+
+            <!-- Status 1000 HPK -->
+            <dt class="col-sm-4 col-md-3 text-muted fw-normal">Status 1000 HPK</dt>
+            <dd class="col-sm-8 col-md-9">
+                {% if anak.melewati_1000hpk %}
+                    <span class="badge bg-danger">
+                        <i class="bi bi-exclamation-triangle-fill me-1"></i>Melewati Periode 1000 HPK
+                    </span>
+                {% else %}
+                    <span class="badge bg-success">
+                        <i class="bi bi-check-circle-fill me-1"></i>Dalam Periode 1000 HPK
+                    </span>
+                {% endif %}
+            </dd>
+        </dl>
+    </div>
+
+    <div class="card-footer bg-white border-top py-3 d-flex flex-wrap gap-2">
+        <a href="{{ url_for('portal.portal_jadwal_anak', anak_id=anak.id) }}"
+           class="btn btn-primary">
+            <i class="bi bi-calendar3 me-1"></i>Lihat Jadwal Imunisasi
+        </a>
+        <a href="{{ url_for('portal.portal_list_anak') }}"
+           class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-1"></i>Kembali ke Daftar Anak
+        </a>
+    </div>
+</div>
+{% endblock %}

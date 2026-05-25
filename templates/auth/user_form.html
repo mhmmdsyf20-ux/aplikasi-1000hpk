@@ -1,60 +1,115 @@
-{% extends 'base.html' %}
-{% block title %}Edit User — {{ user.username }}{% endblock %}
-{% block content %}
+{% extends 'base.html' %} {% block title %}Edit User — {{ user.username }}{%
+endblock %} {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h4 class="fw-bold mb-0"><i class="bi bi-pencil-square me-2 text-primary"></i>Edit User</h4>
-    <a href="{{ url_for('auth.admin_users') }}" class="btn btn-outline-secondary">
-        <i class="bi bi-arrow-left me-1"></i>Kembali
-    </a>
+  <h4 class="fw-bold mb-0">
+    <i class="bi bi-pencil-square me-2 text-primary"></i>Edit User
+  </h4>
+  <a href="{{ url_for('auth.admin_users') }}" class="btn btn-outline-secondary">
+    <i class="bi bi-arrow-left me-1"></i>Kembali
+  </a>
 </div>
 
-<div class="card border-0 shadow-sm" style="max-width:600px;">
-    <div class="card-body p-4">
-        <form method="POST" action="{{ url_for('auth.admin_edit_user', user_id=user.id) }}">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+<div class="card border-0 shadow-sm" style="max-width: 600px">
+  <div class="card-body p-4">
+    <form
+      method="POST"
+      action="{{ url_for('auth.admin_edit_user', user_id=user.id) }}"
+    >
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
 
-            <div class="mb-3">
-                <label class="form-label fw-semibold">Username</label>
-                <input type="text" class="form-control" value="{{ user.username }}" disabled>
-                <div class="form-text">Username tidak dapat diubah.</div>
-            </div>
+      <div class="mb-3">
+        <label class="form-label fw-semibold">Username</label>
+        <input
+          type="text"
+          class="form-control"
+          value="{{ user.username }}"
+          disabled
+        />
+        <div class="form-text">Username tidak dapat diubah.</div>
+      </div>
 
-            <div class="mb-3">
-                <label class="form-label fw-semibold">Nama Lengkap <span class="text-danger">*</span></label>
-                <input type="text" name="nama_lengkap" class="form-control"
-                       value="{{ user.nama_lengkap }}" required>
-            </div>
+      <div class="mb-3">
+        <label class="form-label fw-semibold"
+          >Nama Lengkap <span class="text-danger">*</span></label
+        >
+        <input
+          type="text"
+          name="nama_lengkap"
+          class="form-control"
+          value="{{ user.nama_lengkap }}"
+          required
+        />
+      </div>
 
-            <div class="mb-3">
-                <label class="form-label fw-semibold">Role <span class="text-danger">*</span></label>
-                <select name="role" class="form-select" required>
-                    <option value="petugas" {% if user.role == 'petugas' %}selected{% endif %}>Petugas</option>
-                    <option value="admin" {% if user.role == 'admin' %}selected{% endif %}>Admin</option>
-                </select>
-            </div>
+      <div class="mb-3">
+        <label class="form-label fw-semibold"
+          >Role <span class="text-danger">*</span></label
+        >
+        <select name="role" class="form-select" required>
+          <option
+            value="petugas"
+            {%
+            if
+            user.role=""
+            ="petugas"
+            %}selected{%
+            endif
+            %}
+          >
+            Petugas
+          </option>
+          <option
+            value="admin"
+            {%
+            if
+            user.role=""
+            ="admin"
+            %}selected{%
+            endif
+            %}
+          >
+            Admin
+          </option>
+          <option value="user" {% if user.role="" ="user" %}selected{% endif %}>
+            Ibu
+          </option>
+        </select>
+      </div>
 
-            <div class="mb-3">
-                <label class="form-label fw-semibold">Status Akun</label>
-                <select name="is_active" class="form-select">
-                    <option value="1" {% if user.is_active %}selected{% endif %}>Aktif</option>
-                    <option value="0" {% if not user.is_active %}selected{% endif %}>Nonaktif</option>
-                </select>
-            </div>
+      <div class="mb-3">
+        <label class="form-label fw-semibold">Status Akun</label>
+        <select name="is_active" class="form-select">
+          <option value="1" {% if user.is_active %}selected{% endif %}>
+            Aktif
+          </option>
+          <option value="0" {% if not user.is_active %}selected{% endif %}>
+            Nonaktif
+          </option>
+        </select>
+      </div>
 
-            <div class="mb-4">
-                <label class="form-label fw-semibold">Password Baru</label>
-                <input type="password" name="password" class="form-control"
-                       placeholder="Kosongkan jika tidak ingin mengubah password">
-                <div class="form-text">Isi hanya jika ingin mengubah password.</div>
-            </div>
+      <div class="mb-4">
+        <label class="form-label fw-semibold">Password Baru</label>
+        <input
+          type="password"
+          name="password"
+          class="form-control"
+          placeholder="Kosongkan jika tidak ingin mengubah password"
+        />
+        <div class="form-text">Isi hanya jika ingin mengubah password.</div>
+      </div>
 
-            <div class="d-flex gap-2">
-                <button type="submit" class="btn btn-primary">
-                    <i class="bi bi-save me-1"></i>Simpan Perubahan
-                </button>
-                <a href="{{ url_for('auth.admin_users') }}" class="btn btn-outline-secondary">Batal</a>
-            </div>
-        </form>
-    </div>
+      <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-primary">
+          <i class="bi bi-save me-1"></i>Simpan Perubahan
+        </button>
+        <a
+          href="{{ url_for('auth.admin_users') }}"
+          class="btn btn-outline-secondary"
+          >Batal</a
+        >
+      </div>
+    </form>
+  </div>
 </div>
 {% endblock %}

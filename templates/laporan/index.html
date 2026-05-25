@@ -103,7 +103,7 @@
                             {% endif %}
                         </td>
                         <td class="text-muted small">
-                            {{ imun.petugas.nama_lengkap if imun.petugas_id and imun.petugas else '—' }}
+                            {{ petugas_map.get(imun.petugas_id, '—') if imun.petugas_id else '—' }}
                         </td>
                     </tr>
                     {% endfor %}

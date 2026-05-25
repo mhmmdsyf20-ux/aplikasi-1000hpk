@@ -10,6 +10,7 @@ from flask import abort
 from flask_login import current_user
 
 from models import User
+from services.master_service import master_only as master_only
 
 
 def authenticate_user(username: str, password: str):
@@ -29,6 +30,10 @@ def authenticate_user(username: str, password: str):
     if user and user.check_password(password):
         return user
     return None
+
+
+# Expose alias for backward compatibility
+petugas_only = master_only
 
 
 def role_required(*roles):

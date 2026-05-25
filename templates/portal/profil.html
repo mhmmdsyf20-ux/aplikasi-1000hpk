@@ -1,0 +1,44 @@
+{% extends "portal/base.html" %}
+{% block title %}Profil Saya{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="fw-bold mb-0"><i class="bi bi-person-circle me-2 text-pink"></i>Profil Saya</h4>
+    <a href="{{ url_for('portal.portal_dashboard') }}" class="btn btn-outline-secondary btn-sm">
+        <i class="bi bi-arrow-left me-1"></i>Kembali
+    </a>
+</div>
+
+<div class="card border-0 shadow-sm" style="max-width:500px;">
+    <div class="card-body p-4">
+        <form method="POST" action="{{ url_for('portal.portal_profil') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Email</label>
+                <input type="text" class="form-control" value="{{ current_user.email }}" disabled>
+                <div class="form-text">Email tidak dapat diubah.</div>
+            </div>
+
+            <div class="mb-3">
+                <label for="nama_lengkap" class="form-label fw-semibold">
+                    Nama Lengkap <span class="text-danger">*</span>
+                </label>
+                <input type="text" id="nama_lengkap" name="nama_lengkap" class="form-control"
+                       value="{{ current_user.nama_lengkap }}" required>
+            </div>
+
+            <div class="mb-4">
+                <label for="no_whatsapp" class="form-label fw-semibold">Nomor WhatsApp</label>
+                <input type="tel" id="no_whatsapp" name="no_whatsapp" class="form-control"
+                       value="{{ current_user.no_whatsapp or '' }}"
+                       placeholder="Contoh: 08123456789">
+                <div class="form-text">Digunakan untuk menerima notifikasi imunisasi.</div>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100">
+                <i class="bi bi-save me-1"></i>Simpan Profil
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

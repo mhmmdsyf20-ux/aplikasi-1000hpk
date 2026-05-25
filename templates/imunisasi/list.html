@@ -9,44 +9,118 @@
 <div class="card border-0 shadow-sm mb-4">
     <div class="card-body">
         <form method="GET" class="row g-2 align-items-end">
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <label class="form-label small fw-semibold">Filter Status</label>
-                <select name="status" class="form-select" onchange="this.form.submit()">
+                <select name="status" class="form-select">
                     <option value="">Semua Status</option>
                     <option value="terjadwal" {% if status_filter == 'terjadwal' %}selected{% endif %}>Terjadwal</option>
                     <option value="selesai" {% if status_filter == 'selesai' %}selected{% endif %}>Selesai</option>
                     <option value="terlewat" {% if status_filter == 'terlewat' %}selected{% endif %}>Terlewat</option>
+                    <option value="belum" {% if status_filter == 'belum' %}selected{% endif %}>Belum Terlaksana</option>
                 </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small fw-semibold">Bulan</label>
+                <select name="bulan" class="form-select">
+                    <option value="">Semua Bulan</option>
+                    {% for b in range(1, 13) %}
+                    <option value="{{ b }}" {% if bulan_filter == b %}selected{% endif %}>
+                        {{ ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'][b-1] }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small fw-semibold">Tahun</label>
+                <select name="tahun" class="form-select">
+                    <option value="">Semua Tahun</option>
+                    {% for t in tahun_list %}
+                    <option value="{{ t }}" {% if tahun_filter == t %}selected{% endif %}>{{ t }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="bi bi-funnel me-1"></i>Filter
+                </button>
+            </div>
+            <div class="col-md-2">
+                <a href="{{ url_for('imunisasi.list_imunisasi') }}" class="btn btn-outline-secondary w-100">
+                    <i class="bi bi-x-circle me-1"></i>Reset
+                </a>
             </div>
         </form>
     </div>
 </div>
 
+<!-- Summary cards -->
+<div class="row g-3 mb-4">
+    <div class="col-sm-3">
+        <div class="card border-0 shadow-sm text-center p-3">
+            <div class="fs-3 fw-bold text-primary">{{ total_terjadwal }}</div>
+            <div class="small" style="color:var(--gg-muted)">Terjadwal</div>
+        </div>
+    </div>
+    <div class="col-sm-3">
+        <div class="card border-0 shadow-sm text-center p-3">
+            <div class="fs-3 fw-bold text-success">{{ total_selesai }}</div>
+            <div class="small" style="color:var(--gg-muted)">Selesai</div>
+        </div>
+    </div>
+    <div class="col-sm-3">
+        <div class="card border-0 shadow-sm text-center p-3">
+            <div class="fs-3 fw-bold text-danger">{{ total_terlewat }}</div>
+            <div class="small" style="color:var(--gg-muted)">Terlewat</div>
+        </div>
+    </div>
+    <div class="col-sm-3">
+        <div class="card border-0 shadow-sm text-center p-3">
+            <div class="fs-3 fw-bold text-warning">{{ total_belum }}</div>
+            <div class="small" style="color:var(--gg-muted)">Belum Terlaksana</div>
+        </div>
+    </div>
+</div>
+
 <div class="card border-0 shadow-sm">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h6 class="mb-0 fw-semibold">
+            <i class="bi bi-list-ul me-2"></i>Daftar Jadwal
+            <span class="badge bg-primary ms-2">{{ imunisasi_list|length }}</span>
+        </h6>
+    </div>
     <div class="card-body p-0">
         {% if imunisasi_list %}
         <div class="table-responsive">
             <table class="table table-hover mb-0">
                 <thead class="table-light">
-                    <tr><th>Nama Anak</th><th>Vaksin</th><th>Tanggal Jadwal</th><th>Status</th><th>Aksi</th></tr>
+                    <tr>
+                        <th>#</th><th>Nama Anak</th><th>Vaksin</th>
+                        <th>Tanggal Jadwal</th><th>Tanggal Realisasi</th>
+                        <th>Status</th><th>Aksi</th>
+                    </tr>
                 </thead>
                 <tbody>
                     {% for imun in imunisasi_list %}
                     <tr>
-                        <td><a href="{{ url_for('anak.detail_anak', anak_id=imun.anak.id) }}" class="text-decoration-none fw-semibold">{{ imun.anak.nama }}</a></td>
+                        <td class="text-muted small">{{ loop.index }}</td>
+                        <td>
+                            <a href="{{ url_for('anak.detail_anak', anak_id=imun.anak.id) }}"
+                               class="text-decoration-none fw-semibold">{{ imun.anak.nama }}</a>
+                        </td>
                         <td>{{ imun.nama_vaksin }}</td>
                         <td>{{ imun.tanggal_jadwal.strftime('%d %b %Y') }}</td>
+                        <td>{{ imun.tanggal_realisasi.strftime('%d %b %Y') if imun.tanggal_realisasi else '—' }}</td>
                         <td>
                             {% if imun.status == 'selesai' %}
-                            <span class="badge bg-success">Selesai</span>
+                            <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>Selesai</span>
                             {% elif imun.status == 'terlewat' %}
-                            <span class="badge bg-danger">Terlewat</span>
+                            <span class="badge bg-danger"><i class="bi bi-x-circle me-1"></i>Terlewat</span>
                             {% else %}
-                            <span class="badge bg-primary">Terjadwal</span>
+                            <span class="badge bg-warning text-dark"><i class="bi bi-clock me-1"></i>Belum Terlaksana</span>
                             {% endif %}
                         </td>
                         <td>
-                            {% if imun.status == 'terjadwal' %}
+                            {% if imun.status != 'selesai' %}
                             <button type="button" class="btn btn-sm btn-success"
                                     data-bs-toggle="modal" data-bs-target="#modalSelesai{{ imun.id }}">
                                 <i class="bi bi-check-circle me-1"></i>Tandai Selesai
@@ -54,31 +128,41 @@
                             <!-- Modal -->
                             <div class="modal fade" id="modalSelesai{{ imun.id }}" tabindex="-1">
                                 <div class="modal-dialog">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
+                                    <div class="modal-content" style="background:var(--gg-surface);border:1px solid var(--gg-border)">
+                                        <div class="modal-header" style="border-color:var(--gg-border)">
                                             <h5 class="modal-title">Tandai Selesai: {{ imun.nama_vaksin }}</h5>
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                                         </div>
                                         <form method="POST" action="{{ url_for('imunisasi.tandai_imunisasi_selesai', imunisasi_id=imun.id) }}">
                                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                             <div class="modal-body">
+                                                <p class="small" style="color:var(--gg-muted)">
+                                                    Anak: <strong>{{ imun.anak.nama }}</strong> |
+                                                    Jadwal: <strong>{{ imun.tanggal_jadwal.strftime('%d %b %Y') }}</strong>
+                                                </p>
                                                 <div class="mb-3">
                                                     <label class="form-label fw-semibold">Tanggal Realisasi <span class="text-danger">*</span></label>
-                                                    <input type="date" name="tanggal_realisasi" class="form-control" required>
+                                                    <input type="date" name="tanggal_realisasi" class="form-control"
+                                                           value="{{ imun.tanggal_jadwal.strftime('%Y-%m-%d') }}" required>
                                                 </div>
                                                 <div class="mb-3">
                                                     <label class="form-label fw-semibold">Catatan</label>
-                                                    <textarea name="catatan" class="form-control" rows="2"></textarea>
+                                                    <textarea name="catatan" class="form-control" rows="2"
+                                                              placeholder="Catatan tambahan (opsional)"></textarea>
                                                 </div>
                                             </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                                                <button type="submit" class="btn btn-success">Simpan</button>
+                                            <div class="modal-footer" style="border-color:var(--gg-border)">
+                                                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
+                                                <button type="submit" class="btn btn-success">
+                                                    <i class="bi bi-check-circle me-1"></i>Simpan
+                                                </button>
                                             </div>
                                         </form>
                                     </div>
                                 </div>
                             </div>
+                            {% else %}
+                            <span class="text-muted small">—</span>
                             {% endif %}
                         </td>
                     </tr>
@@ -87,9 +171,9 @@
             </table>
         </div>
         {% else %}
-        <div class="text-center text-muted py-5">
+        <div class="text-center py-5" style="color:var(--gg-muted)">
             <i class="bi bi-clipboard2 fs-1"></i>
-            <p class="mt-3 mb-0">Tidak ada jadwal imunisasi.</p>
+            <p class="mt-3 mb-0">Tidak ada jadwal imunisasi untuk filter yang dipilih.</p>
         </div>
         {% endif %}
     </div>

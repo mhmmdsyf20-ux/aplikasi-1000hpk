@@ -1,0 +1,187 @@
+{% extends "portal/base.html" %} {% block title %}Login Portal Ibu{% endblock %} {% block
+extra_head %}
+<style>
+  body {
+    background: linear-gradient(135deg, #0f4c81 0%, #1a7a6e 40%, #22c55e 100%) !important;
+    background-size: 400% 400% !important;
+    animation: gradientShift 8s ease infinite;
+    min-height: 100vh;
+  }
+  @keyframes gradientShift {
+    0%   { background-position: 0% 50%; }
+    50%  { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+  .bubbles {
+    position: fixed; top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none; z-index: 0; overflow: hidden;
+  }
+  .bubble {
+    position: absolute; bottom: -150px; border-radius: 50%;
+    background: rgba(255,255,255,0.08);
+    animation: floatUp linear infinite;
+  }
+  .bubble:nth-child(1) { width:40px; height:40px; left:10%; animation-duration:8s; }
+  .bubble:nth-child(2) { width:20px; height:20px; left:25%; animation-duration:12s; animation-delay:2s; }
+  .bubble:nth-child(3) { width:60px; height:60px; left:50%; animation-duration:10s; animation-delay:1s; }
+  .bubble:nth-child(4) { width:30px; height:30px; left:70%; animation-duration:9s;  animation-delay:3s; }
+  .bubble:nth-child(5) { width:50px; height:50px; left:85%; animation-duration:11s; animation-delay:0.5s; }
+  @keyframes floatUp {
+    0%   { transform: translateY(0) rotate(0deg); opacity:0.6; }
+    100% { transform: translateY(-110vh) rotate(720deg); opacity:0; }
+  }
+  .login-wrapper {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+    position: relative;
+    z-index: 1;
+  }
+  .login-card {
+    max-width: 420px;
+    width: 100%;
+    border-radius: 1.5rem;
+    border: 1px solid rgba(255,255,255,0.25) !important;
+    background: rgba(255,255,255,0.12) !important;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    box-shadow: 0 25px 60px rgba(0,0,0,0.3) !important;
+    animation: slideUp 0.6s ease both;
+    color: #fff;
+  }
+  @keyframes slideUp {
+    from { opacity:0; transform:translateY(40px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+  .login-icon {
+    width: 64px; height: 64px;
+    background: linear-gradient(135deg, #0ea5e9, #22c55e);
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    animation: pulse 3s ease-in-out infinite;
+    box-shadow: 0 8px 24px rgba(14,165,233,0.4);
+  }
+  @keyframes pulse {
+    0%,100% { transform:scale(1); }
+    50%      { transform:scale(1.06); }
+  }
+  h5.fw-bold { color: #fff !important; }
+  .text-muted { color: rgba(255,255,255,0.7) !important; }
+  .form-label { color: rgba(255,255,255,0.85) !important; font-size:0.78rem; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; }
+  .input-group-text {
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.25);
+    border-right: none;
+    color: rgba(255,255,255,0.8);
+  }
+  .form-control {
+    background: rgba(255,255,255,0.15) !important;
+    border: 1px solid rgba(255,255,255,0.25) !important;
+    border-left: none !important;
+    color: #fff !important;
+  }
+  .form-control::placeholder { color: rgba(255,255,255,0.5); }
+  .form-control:focus {
+    background: rgba(255,255,255,0.22) !important;
+    border-color: rgba(255,255,255,0.6) !important;
+    box-shadow: none !important;
+    color: #fff !important;
+  }
+  .input-group:focus-within .input-group-text { border-color: rgba(255,255,255,0.6); }
+  .btn-primary {
+    background: linear-gradient(135deg, #0ea5e9, #22c55e) !important;
+    border: none !important;
+    border-radius: 0.75rem;
+    font-weight: 700;
+    box-shadow: 0 4px 15px rgba(14,165,233,0.4);
+    transition: all 0.3s ease;
+  }
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(14,165,233,0.5) !important;
+    background: linear-gradient(135deg, #0284c7, #16a34a) !important;
+  }
+  .card-body a { color: rgba(255,255,255,0.85); font-weight:600; }
+  .card-body a:hover { color: #fff; }
+  hr { border-color: rgba(255,255,255,0.2); }
+</style>
+{% endblock %} {% block content %}
+<div class="bubbles">
+  <div class="bubble"></div>
+  <div class="bubble"></div>
+  <div class="bubble"></div>
+  <div class="bubble"></div>
+  <div class="bubble"></div>
+</div>
+<div class="login-wrapper">
+  <div class="login-card card shadow mx-auto">
+    <div class="card-body p-4 p-sm-5">
+      <!-- Ikon & Judul -->
+      <div class="text-center mb-4">
+        <div class="login-icon mb-3">
+          <i class="bi bi-heart-pulse-fill fs-2 text-white"></i>
+        </div>
+        <h5 class="fw-bold mb-1">Portal Ibu</h5>
+        <p class="text-muted small mb-0">Pantau jadwal imunisasi anak Anda</p>
+      </div>
+
+      <hr />
+
+      <!-- Flash messages -->
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible fade show py-2 small" role="alert">
+              {{ message }}
+              <button type="button" class="btn-close btn-sm" data-bs-dismiss="alert"></button>
+            </div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+
+      <!-- Form Login -->
+      <form method="POST" action="{{ url_for('portal.portal_login') }}" novalidate>
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+
+        <div class="mb-3">
+          <label for="email" class="form-label">Email</label>
+          <div class="input-group">
+            <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+            <input type="email" id="email" name="email" class="form-control"
+              placeholder="contoh@email.com" required autofocus autocomplete="email" />
+          </div>
+        </div>
+
+        <div class="mb-4">
+          <label for="password" class="form-label">Password</label>
+          <div class="input-group">
+            <span class="input-group-text"><i class="bi bi-lock"></i></span>
+            <input type="password" id="password" name="password" class="form-control"
+              placeholder="Masukkan password" required autocomplete="current-password" />
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold">
+          <i class="bi bi-box-arrow-in-right me-2"></i>Masuk
+        </button>
+      </form>
+
+      <p class="text-center small mt-4 mb-0" style="color:rgba(255,255,255,0.7);">
+        Belum punya akun?
+        <a href="{{ url_for('portal.portal_register') }}" class="text-decoration-none">Daftar di sini</a>
+      </p>
+
+      <p class="text-center small mt-2 mb-0" style="color:rgba(255,255,255,0.5);">
+        <a href="{{ url_for('auth.login') }}" class="text-decoration-none" style="color:rgba(255,255,255,0.6);">
+          ← Login sebagai Tenaga Kesehatan
+        </a>
+      </p>
+    </div>
+  </div>
+</div>
+{% endblock %}

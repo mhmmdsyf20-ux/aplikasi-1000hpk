@@ -11,6 +11,7 @@ Contoh penggunaan:
 import sys
 import logging
 from flask import Flask, render_template, redirect, url_for
+from flask_login import current_user
 
 from config import Config, config_map
 from extensions import db, login_manager, csrf
@@ -67,6 +68,9 @@ def create_app(config=None):
     from blueprints.edukasi import edukasi_bp
     app.register_blueprint(edukasi_bp)
 
+    from blueprints.portal import portal_bp
+    app.register_blueprint(portal_bp)
+
     # ── Error handlers ─────────────────────────────────────────────────────────
     @app.errorhandler(403)
     def forbidden(e):
@@ -93,10 +97,14 @@ def create_app(config=None):
     def load_user(user_id):
         return User.query.get(int(user_id))
 
-    # ── Route utama: redirect / ke dashboard ──────────────────────────────────
+    # ── Route utama: redirect / ke halaman dashboard sesuai role ─────────────
     @app.route('/')
     def index():
-        return redirect(url_for('anak.dashboard'))
+        if hasattr(current_user, 'is_authenticated') and current_user.is_authenticated:
+            if current_user.role == 'user':
+                return redirect(url_for('portal.portal_dashboard'))
+            return redirect(url_for('anak.dashboard'))
+        return redirect(url_for('auth.login'))
 
     # ── Inisialisasi DB dilakukan lazy (saat request pertama) ─────────────────
     _db_initialized = {'done': False}

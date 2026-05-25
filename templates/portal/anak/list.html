@@ -1,0 +1,234 @@
+{% extends "portal/base.html" %}
+
+{% block title %}Anak Saya{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="d-flex align-items-center justify-content-between mb-4">
+    <div>
+        <h4 class="mb-0 fw-bold">
+            <i class="bi bi-people-fill me-2 text-primary"></i>Anak Saya
+        </h4>
+        <small class="text-muted">Daftar anak yang terdaftar dalam program imunisasi</small>
+    </div>
+    <a href="{{ url_for('portal.portal_tambah_anak') }}" class="btn btn-primary btn-sm">
+        <i class="bi bi-plus-circle me-1"></i>Daftarkan Anak
+    </a>
+</div>
+
+{% if not anak_list %}
+<!-- Empty State -->
+<div class="alert alert-info" role="alert">
+    <i class="bi bi-info-circle-fill me-2"></i>
+    Belum ada data anak.
+    <a href="{{ url_for('portal.portal_tambah_anak') }}" class="alert-link">Daftarkan anak sekarang</a>
+    atau hubungi petugas puskesmas.
+</div>
+
+{% else %}
+<!-- Tabel Daftar Anak (Desktop) -->
+<div class="card border-0 shadow-sm d-none d-md-block">
+    <div class="card-header bg-white border-bottom py-3">
+        <h5 class="mb-0 fw-semibold">
+            <i class="bi bi-list-ul me-2 text-primary"></i>
+            Daftar Anak ({{ anak_list | length }} anak)
+        </h5>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th class="ps-4">Nama Anak</th>
+                        <th>Tanggal Lahir</th>
+                        <th>Umur</th>
+                        <th>Jenis Kelamin</th>
+                        <th>Kelengkapan Imunisasi</th>
+                        <th class="text-center">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in anak_progress %}
+                    {% set anak = item.anak %}
+                    {% set persen = item.persen %}
+                    <tr>
+                        <!-- Nama Anak -->
+                        <td class="ps-4">
+                            <div class="fw-semibold">
+                                <i class="bi bi-person-fill me-1 text-primary"></i>
+                                {{ anak.nama }}
+                            </div>
+                        </td>
+
+                        <!-- Tanggal Lahir -->
+                        <td>
+                            <i class="bi bi-calendar3 me-1 text-muted"></i>
+                            {{ anak.tanggal_lahir.strftime('%d %B %Y') }}
+                        </td>
+
+                        <!-- Umur -->
+                        <td>
+                            <span class="badge bg-secondary bg-opacity-10 text-secondary fw-normal">
+                                {{ anak.umur_bulan }} bulan
+                            </span>
+                        </td>
+
+                        <!-- Jenis Kelamin -->
+                        <td>
+                            {% if anak.jenis_kelamin == 'L' %}
+                                <span class="badge bg-primary bg-opacity-10 text-primary fw-normal">
+                                    <i class="bi bi-gender-male me-1"></i>Laki-laki
+                                </span>
+                            {% else %}
+                                <span class="badge bg-danger bg-opacity-10 text-danger fw-normal">
+                                    <i class="bi bi-gender-female me-1"></i>Perempuan
+                                </span>
+                            {% endif %}
+                        </td>
+
+                        <!-- Progress Imunisasi -->
+                        <td style="min-width: 160px;">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <small class="text-muted">Kelengkapan</small>
+                                <small class="fw-semibold
+                                    {% if persen >= 100 %}text-success
+                                    {% elif persen >= 50 %}text-primary
+                                    {% else %}text-warning{% endif %}">
+                                    {{ persen | round(1) }}%
+                                </small>
+                            </div>
+                            <div class="progress" style="height: 8px;" role="progressbar"
+                                 aria-valuenow="{{ persen | round(1) }}"
+                                 aria-valuemin="0" aria-valuemax="100"
+                                 aria-label="Kelengkapan imunisasi {{ anak.nama }}">
+                                <div class="progress-bar
+                                    {% if persen >= 100 %}bg-success
+                                    {% elif persen >= 50 %}bg-primary
+                                    {% else %}bg-warning{% endif %}"
+                                     style="width: {{ persen | round(1) }}%">
+                                </div>
+                            </div>
+                        </td>
+
+                        <!-- Aksi -->
+                        <td class="text-center">
+                            <div class="d-flex gap-2 justify-content-center">
+                                <a href="{{ url_for('portal.portal_detail_anak', anak_id=anak.id) }}"
+                                   class="btn btn-sm btn-outline-primary"
+                                   title="Lihat detail {{ anak.nama }}">
+                                    <i class="bi bi-eye me-1"></i>Detail
+                                </a>
+                                <a href="{{ url_for('portal.portal_jadwal_anak', anak_id=anak.id) }}"
+                                   class="btn btn-sm btn-outline-success"
+                                   title="Lihat jadwal imunisasi {{ anak.nama }}">
+                                    <i class="bi bi-calendar3 me-1"></i>Jadwal
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Kartu Daftar Anak (Mobile) -->
+<div class="d-md-none">
+    <div class="mb-3">
+        <span class="text-muted small">{{ anak_list | length }} anak terdaftar</span>
+    </div>
+    <div class="row g-3">
+        {% for item in anak_progress %}
+        {% set anak = item.anak %}
+        {% set persen = item.persen %}
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <!-- Header Kartu -->
+                    <div class="d-flex align-items-start justify-content-between mb-3">
+                        <div>
+                            <h6 class="card-title fw-bold mb-1">
+                                <i class="bi bi-person-fill me-1 text-primary"></i>
+                                {{ anak.nama }}
+                            </h6>
+                            <div class="d-flex flex-wrap gap-2">
+                                <!-- Jenis Kelamin -->
+                                {% if anak.jenis_kelamin == 'L' %}
+                                    <span class="badge bg-primary bg-opacity-10 text-primary fw-normal">
+                                        <i class="bi bi-gender-male me-1"></i>Laki-laki
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-danger bg-opacity-10 text-danger fw-normal">
+                                        <i class="bi bi-gender-female me-1"></i>Perempuan
+                                    </span>
+                                {% endif %}
+                                <!-- Umur -->
+                                <span class="badge bg-secondary bg-opacity-10 text-secondary fw-normal">
+                                    {{ anak.umur_bulan }} bulan
+                                </span>
+                            </div>
+                        </div>
+                        <!-- Persentase -->
+                        <div class="text-end">
+                            <div class="fw-bold fs-5
+                                {% if persen >= 100 %}text-success
+                                {% elif persen >= 50 %}text-primary
+                                {% else %}text-warning{% endif %}">
+                                {{ persen | round(1) }}%
+                            </div>
+                            <small class="text-muted">imunisasi</small>
+                        </div>
+                    </div>
+
+                    <!-- Tanggal Lahir -->
+                    <div class="mb-3">
+                        <small class="text-muted">
+                            <i class="bi bi-calendar3 me-1"></i>
+                            Lahir: {{ anak.tanggal_lahir.strftime('%d %B %Y') }}
+                        </small>
+                    </div>
+
+                    <!-- Progress Bar -->
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <small class="text-muted">Kelengkapan Imunisasi</small>
+                            <small class="fw-semibold
+                                {% if persen >= 100 %}text-success
+                                {% elif persen >= 50 %}text-primary
+                                {% else %}text-warning{% endif %}">
+                                {{ persen | round(1) }}%
+                            </small>
+                        </div>
+                        <div class="progress" style="height: 8px;" role="progressbar"
+                             aria-valuenow="{{ persen | round(1) }}"
+                             aria-valuemin="0" aria-valuemax="100"
+                             aria-label="Kelengkapan imunisasi {{ anak.nama }}">
+                            <div class="progress-bar
+                                {% if persen >= 100 %}bg-success
+                                {% elif persen >= 50 %}bg-primary
+                                {% else %}bg-warning{% endif %}"
+                                 style="width: {{ persen | round(1) }}%">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tombol Aksi -->
+                    <div class="d-flex gap-2">
+                        <a href="{{ url_for('portal.portal_detail_anak', anak_id=anak.id) }}"
+                           class="btn btn-sm btn-outline-primary flex-fill">
+                            <i class="bi bi-eye me-1"></i>Detail
+                        </a>
+                        <a href="{{ url_for('portal.portal_jadwal_anak', anak_id=anak.id) }}"
+                           class="btn btn-sm btn-outline-success flex-fill">
+                            <i class="bi bi-calendar3 me-1"></i>Jadwal
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+{% endblock %}

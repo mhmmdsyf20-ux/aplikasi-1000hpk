@@ -1,13 +1,15 @@
-import sys
 import os
+import sys
+from pathlib import Path
 
-# Tambahkan path proyek ke sys.path
-project_home = '/home/USERNAMU/mysite'  # Ganti USERNAMU dengan username PythonAnywhere kamu
-if project_home not in sys.path:
-    sys.path.insert(0, project_home)
+# Use the repository root as the application path.
+project_home = Path(__file__).resolve().parent
+if str(project_home) not in sys.path:
+    sys.path.insert(0, str(project_home))
 
-# Set environment variable agar tidak exit saat DB error
-os.environ['FLASK_TESTING'] = ''
+# Load .env from repository root if present.
+from dotenv import load_dotenv
+load_dotenv(project_home / '.env')
 
 from app import create_app
 application = create_app()

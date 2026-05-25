@@ -128,11 +128,11 @@ class TestLogout:
 
 class TestProteksiRoute:
     def test_akses_route_admin_tanpa_login_redirect_ke_login(self, client, db):
-        """Akses /auth/admin/users tanpa login → redirect ke /auth/login."""
+        """Akses /auth/admin/users tanpa login → 401 (petugas_only decorator)."""
         resp = client.get('/auth/admin/users', follow_redirects=False)
 
-        assert resp.status_code == 302
-        assert '/auth/login' in resp.location
+        # petugas_only mengembalikan 401 untuk pengguna yang belum autentikasi
+        assert resp.status_code == 401
 
 
 # ─────────────────────────────────────────────────────────────────────────────

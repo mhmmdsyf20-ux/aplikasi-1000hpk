@@ -14,14 +14,15 @@ JADWAL_IDAI = [
     {"nama_vaksin": "Polio 0",        "offset_hari": 0},
     {"nama_vaksin": "DPT-HB-Hib 1",  "offset_hari": 60},
     {"nama_vaksin": "Polio 1",        "offset_hari": 60},
-    {"nama_vaksin": "DPT-HB-Hib 2",  "offset_hari": 120},
-    {"nama_vaksin": "Polio 2",        "offset_hari": 120},
-    {"nama_vaksin": "DPT-HB-Hib 3",  "offset_hari": 180},
-    {"nama_vaksin": "Polio 3",        "offset_hari": 180},
+    {"nama_vaksin": "DPT-HB-Hib 2",  "offset_hari": 90},
+    {"nama_vaksin": "Polio 2",        "offset_hari": 90},
+    {"nama_vaksin": "DPT-HB-Hib 3",  "offset_hari": 120},
+    {"nama_vaksin": "Polio 3",        "offset_hari": 120},
     {"nama_vaksin": "Campak/MR",      "offset_hari": 270},
     {"nama_vaksin": "Polio 4",        "offset_hari": 270},
     {"nama_vaksin": "Booster DPT",    "offset_hari": 540},
     {"nama_vaksin": "Booster Campak", "offset_hari": 540},
+    {"nama_vaksin": "Tifoid",         "offset_hari": 730},
 ]
 
 

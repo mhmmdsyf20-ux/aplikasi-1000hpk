@@ -1,0 +1,71 @@
+{% extends "portal/base.html" %}
+{% block title %}Daftarkan Anak{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="fw-bold mb-0"><i class="bi bi-person-plus-fill me-2 text-primary"></i>Daftarkan Anak</h4>
+    <a href="{{ url_for('portal.portal_list_anak') }}" class="btn btn-outline-secondary btn-sm">
+        <i class="bi bi-arrow-left me-1"></i>Kembali
+    </a>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-body p-4">
+        <div class="alert alert-info mb-4">
+            <i class="bi bi-info-circle-fill me-2"></i>
+            Setelah mendaftarkan anak, jadwal imunisasi akan otomatis dibuat sesuai rekomendasi IDAI.
+        </div>
+
+        <form method="POST" action="{{ url_for('portal.portal_tambah_anak') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label for="nama" class="form-label fw-semibold">Nama Lengkap Anak <span class="text-danger">*</span></label>
+                    <input type="text" id="nama" name="nama" class="form-control"
+                           placeholder="Masukkan nama lengkap anak" required>
+                </div>
+                <div class="col-md-6">
+                    <label for="tanggal_lahir" class="form-label fw-semibold">Tanggal Lahir <span class="text-danger">*</span></label>
+                    <input type="date" id="tanggal_lahir" name="tanggal_lahir" class="form-control"
+                           max="{{ today }}" min="{{ min_date }}" required>
+                    <div class="form-text">Hanya untuk anak usia 0–2 tahun.</div>
+                </div>
+                <div class="col-md-6">
+                    <label for="jenis_kelamin" class="form-label fw-semibold">Jenis Kelamin <span class="text-danger">*</span></label>
+                    <select id="jenis_kelamin" name="jenis_kelamin" class="form-select" required>
+                        <option value="">-- Pilih --</option>
+                        <option value="L">Laki-laki</option>
+                        <option value="P">Perempuan</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label for="no_hp_ortu" class="form-label fw-semibold">Nomor HP Orang Tua <span class="text-danger">*</span></label>
+                    <input type="tel" id="no_hp_ortu" name="no_hp_ortu" class="form-control"
+                           placeholder="Contoh: 08123456789" required>
+                </div>
+                <div class="col-md-6">
+                    <label for="berat_lahir" class="form-label fw-semibold">Berat Lahir (gram)</label>
+                    <input type="number" id="berat_lahir" name="berat_lahir" class="form-control"
+                           placeholder="Contoh: 3200" min="500" max="6000">
+                </div>
+                <div class="col-md-6">
+                    <label for="panjang_lahir" class="form-label fw-semibold">Panjang Lahir (cm)</label>
+                    <input type="number" id="panjang_lahir" name="panjang_lahir" class="form-control"
+                           placeholder="Contoh: 50" min="30" max="70" step="0.1">
+                </div>
+                <div class="col-12">
+                    <label for="alamat" class="form-label fw-semibold">Alamat</label>
+                    <textarea id="alamat" name="alamat" class="form-control" rows="2"
+                              placeholder="Alamat tempat tinggal (opsional)"></textarea>
+                </div>
+            </div>
+            <hr class="my-4">
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-save me-1"></i>Daftarkan Anak
+                </button>
+                <a href="{{ url_for('portal.portal_list_anak') }}" class="btn btn-outline-secondary">Batal</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

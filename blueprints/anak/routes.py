@@ -12,12 +12,13 @@ Routes:
 from datetime import date, timedelta, datetime
 
 from flask import render_template, redirect, url_for, flash, request
-from flask_login import login_required, current_user
+from flask_login import current_user
 
 from blueprints.anak import anak_bp
 from extensions import db
 from models import Anak, Imunisasi
 from services.anak_service import validate_anak_data
+from services.master_service import master_only
 from services.imunisasi_service import generate_jadwal_imunisasi, update_status_terlewat
 _HAS_IMUNISASI_SERVICE = True
 
@@ -27,7 +28,7 @@ _HAS_IMUNISASI_SERVICE = True
 # ─────────────────────────────────────────────────────────────────────────────
 
 @anak_bp.route('/dashboard')
-@login_required
+@master_only
 def dashboard():
     """Dashboard utama aplikasi 1000 HPK."""
     # Update status imunisasi terlewat setiap kali dashboard dibuka
@@ -56,11 +57,10 @@ def dashboard():
     jadwal_mendatang = (
         Imunisasi.query
         .filter(
-            Imunisasi.tanggal_jadwal >= today,
-            Imunisasi.tanggal_jadwal <= next_7,
-            Imunisasi.status == 'terjadwal',
+            Imunisasi.status.in_(['terjadwal', 'terlewat']),
         )
         .order_by(Imunisasi.tanggal_jadwal.asc())
+        .limit(20)
         .all()
     )
 
@@ -79,7 +79,7 @@ def dashboard():
 # ─────────────────────────────────────────────────────────────────────────────
 
 @anak_bp.route('/')
-@login_required
+@master_only
 def list_anak():
     """Daftar semua anak dengan fitur pencarian dan pagination."""
     q = request.args.get('q', '').strip()
@@ -114,7 +114,7 @@ def list_anak():
 # ─────────────────────────────────────────────────────────────────────────────
 
 @anak_bp.route('/tambah', methods=['GET', 'POST'])
-@login_required
+@master_only
 def tambah_anak():
     """Form tambah anak baru."""
     if request.method == 'POST':
@@ -135,13 +135,21 @@ def tambah_anak():
         if data['tanggal_lahir']:
             try:
                 tanggal_lahir = datetime.strptime(data['tanggal_lahir'], '%Y-%m-%d').date()
+                # Validasi umur 0–2 tahun
+                umur_hari = (date.today() - tanggal_lahir).days
+                if umur_hari < 0:
+                    errors.append('Tanggal lahir tidak boleh di masa depan.')
+                elif umur_hari > 730:
+                    errors.append('Aplikasi hanya untuk anak usia 0–2 tahun (maksimal 730 hari).')
             except ValueError:
                 errors.append('Format tanggal lahir tidak valid.')
 
         if errors:
             for err in errors:
                 flash(err, 'danger')
-            return render_template('anak/form.html', data=data, mode='tambah')
+            return render_template('anak/form.html', data=data, mode='tambah',
+                                   today=date.today().strftime('%Y-%m-%d'),
+                                   min_date=(date.today() - timedelta(days=730)).strftime('%Y-%m-%d'))
 
         anak = Anak(
             nama=data['nama'],
@@ -174,7 +182,9 @@ def tambah_anak():
         flash(f'Data anak "{anak.nama}" berhasil disimpan.', 'success')
         return redirect(url_for('anak.detail_anak', anak_id=anak.id))
 
-    return render_template('anak/form.html', data={}, mode='tambah')
+    return render_template('anak/form.html', data={}, mode='tambah',
+                           today=date.today().strftime('%Y-%m-%d'),
+                           min_date=(date.today() - timedelta(days=730)).strftime('%Y-%m-%d'))
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -182,7 +192,7 @@ def tambah_anak():
 # ─────────────────────────────────────────────────────────────────────────────
 
 @anak_bp.route('/<int:anak_id>/edit', methods=['GET', 'POST'])
-@login_required
+@master_only
 def edit_anak(anak_id):
     """Form edit data anak yang sudah ada."""
     anak = Anak.query.get_or_404(anak_id)
@@ -211,7 +221,9 @@ def edit_anak(anak_id):
         if errors:
             for err in errors:
                 flash(err, 'danger')
-            return render_template('anak/form.html', data=data, anak=anak, mode='edit')
+            return render_template('anak/form.html', data=data, anak=anak, mode='edit',
+                                   today=date.today().strftime('%Y-%m-%d'),
+                                   min_date=(date.today() - timedelta(days=730)).strftime('%Y-%m-%d'))
 
         anak.nama = data['nama']
         anak.tanggal_lahir = tanggal_lahir
@@ -237,7 +249,9 @@ def edit_anak(anak_id):
         'panjang_lahir': str(anak.panjang_lahir) if anak.panjang_lahir else '',
     }
 
-    return render_template('anak/form.html', data=data, anak=anak, mode='edit')
+    return render_template('anak/form.html', data=data, anak=anak, mode='edit',
+                           today=date.today().strftime('%Y-%m-%d'),
+                           min_date=(date.today() - timedelta(days=730)).strftime('%Y-%m-%d'))
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -245,7 +259,7 @@ def edit_anak(anak_id):
 # ─────────────────────────────────────────────────────────────────────────────
 
 @anak_bp.route('/<int:anak_id>')
-@login_required
+@master_only
 def detail_anak(anak_id):
     """Halaman detail anak beserta daftar imunisasi."""
     anak = Anak.query.get_or_404(anak_id)
@@ -273,7 +287,7 @@ from calendar import month_abbr
 
 
 @anak_bp.route('/api/chart/status')
-@login_required
+@master_only
 def api_chart_status():
     """Endpoint JSON untuk donut chart status imunisasi."""
     selesai = Imunisasi.query.filter_by(status='selesai').count()
@@ -283,7 +297,7 @@ def api_chart_status():
 
 
 @anak_bp.route('/api/chart/bulanan')
-@login_required
+@master_only
 def api_chart_bulanan():
     """Endpoint JSON untuk bar chart imunisasi selesai per bulan (6 bulan terakhir)."""
     from datetime import timedelta
@@ -314,7 +328,7 @@ def api_chart_bulanan():
 
 
 @anak_bp.route('/api/chart/progress/<int:anak_id>')
-@login_required
+@master_only
 def api_chart_progress(anak_id):
     """Endpoint JSON untuk progress imunisasi per anak."""
     from services.laporan_service import hitung_progress_anak

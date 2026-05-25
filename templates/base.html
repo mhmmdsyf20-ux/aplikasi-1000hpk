@@ -1,124 +1,517 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}1000 HPK{% endblock %} — Aplikasi 1000 HPK</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<!doctype html>
+<html lang="id" data-bs-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}1000 HPK{% endblock %} — 1000 HPK</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+    />
     <style>
-        body { min-height: 100vh; }
-        .sidebar { min-height: 100vh; background-color: #0d6efd; }
-        .sidebar .nav-link { color: rgba(255,255,255,0.85); }
-        .sidebar .nav-link:hover, .sidebar .nav-link.active {
-            color: #fff; background-color: rgba(255,255,255,0.15); border-radius: 0.375rem;
-        }
-        .sidebar .brand { color: #fff; font-weight: 700; font-size: 1.1rem; }
-        .main-content { background-color: #f8f9fa; min-height: 100vh; }
+      :root {
+        --gg-bg: #eff6ff;
+        --gg-surface: #ffffff;
+        --gg-surface2: #f8fbff;
+        --gg-border: #dbeafe;
+        --gg-border-strong: rgba(148, 163, 184, 0.35);
+        --gg-accent: #3b82f6;
+        --gg-accent2: #60a5fa;
+        --gg-text: #0f172a;
+        --gg-muted: #64748b;
+      }
+
+      body {
+        background: linear-gradient(
+          135deg,
+          #eff6ff 0%,
+          #ffffff 55%,
+          #eef7ff 100%
+        );
+        color: var(--gg-text);
+        min-height: 100vh;
+        font-family: "Segoe UI", sans-serif;
+        background-attachment: fixed;
+      }
+
+      /* ── Sidebar ── */
+      .sidebar {
+        min-height: 100vh;
+        background: linear-gradient(
+          180deg,
+          #ffffff 0%,
+          #eff6ff 100%
+        ) !important;
+        border-right: 1px solid var(--gg-border) !important;
+      }
+      .sidebar .brand {
+        color: #0f172a;
+        font-weight: 800;
+        font-size: 1rem;
+        letter-spacing: 0.5px;
+      }
+      .sidebar .brand span {
+        background: linear-gradient(135deg, #3b82f6, #60a5fa);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+      .sidebar .nav-link {
+        color: #475569;
+        border-radius: 0.75rem;
+        padding: 0.55rem 0.9rem;
+        font-size: 0.9rem;
+        transition: all 0.2s;
+      }
+      .sidebar .nav-link:hover {
+        color: #0f172a;
+        background-color: rgba(59, 130, 246, 0.12);
+      }
+      .sidebar .nav-link.active {
+        color: #fff;
+        background: linear-gradient(135deg, #3b82f6, #60a5fa);
+        box-shadow: 0 8px 20px rgba(59, 130, 246, 0.18);
+      }
+      .sidebar-divider {
+        border-color: var(--gg-border);
+        margin: 0.75rem 0;
+      }
+
+      /* ── Topbar ── */
+      .topbar {
+        background: rgba(255, 255, 255, 0.95) !important;
+        border-bottom: 1px solid rgba(59, 130, 246, 0.12) !important;
+        backdrop-filter: blur(8px);
+      }
+      .topbar .brand-mobile {
+        color: var(--gg-accent);
+        font-weight: 800;
+      }
+
+      /* ── Main content ── */
+      .main-content {
+        background: linear-gradient(
+          160deg,
+          #f8fbff 0%,
+          #eef7ff 100%
+        ) !important;
+        min-height: 100vh;
+      }
+
+      /* ── Cards ── */
+      .card {
+        background: rgba(255, 255, 255, 0.96) !important;
+        border: 1px solid rgba(219, 234, 254, 0.8) !important;
+        color: var(--gg-text) !important;
+      }
+      .card-header {
+        background: linear-gradient(90deg, #eff6ff, #dbeafe) !important;
+        border-bottom: 1px solid rgba(219, 234, 254, 0.9) !important;
+        color: var(--gg-text);
+      }
+
+      /* ── Tables ── */
+      .table {
+        color: var(--gg-text);
+        --bs-table-bg: transparent;
+        --bs-table-hover-bg: rgba(59, 130, 246, 0.08);
+      }
+      .table thead th {
+        background: linear-gradient(90deg, #eff6ff, #dbeafe);
+        border-color: rgba(219, 234, 254, 0.9);
+        color: #475569;
+        font-size: 0.78rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+      .table td,
+      .table th {
+        border-color: rgba(219, 234, 254, 0.8);
+      }
+      .table-light {
+        --bs-table-bg: #f8fbff;
+        --bs-table-color: var(--gg-text);
+      }
+
+      /* ── Forms ── */
+      .form-control,
+      .form-select {
+        background-color: #f8fbff;
+        border-color: rgba(219, 234, 254, 0.9);
+        color: var(--gg-text);
+      }
+      .form-control:focus,
+      .form-select:focus {
+        background-color: #ffffff;
+        border-color: var(--gg-accent);
+        color: var(--gg-text);
+        box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.2);
+      }
+      .form-control::placeholder {
+        color: var(--gg-muted);
+      }
+      .form-label {
+        color: var(--gg-text);
+      }
+      .form-text {
+        color: var(--gg-muted);
+      }
+
+      /* ── Buttons ── */
+      .btn-primary {
+        background: linear-gradient(
+          135deg,
+          var(--gg-accent),
+          var(--gg-accent2)
+        );
+        border: none;
+        box-shadow: 0 10px 25px rgba(59, 130, 246, 0.15);
+      }
+      .btn-primary:hover {
+        background: linear-gradient(135deg, #2563eb, #3b82f6);
+        border: none;
+      }
+      .btn-outline-primary {
+        color: var(--gg-accent);
+        border-color: var(--gg-accent);
+      }
+      .btn-outline-primary:hover {
+        background-color: var(--gg-accent);
+        border-color: var(--gg-accent);
+        color: #fff;
+      }
+      .btn-outline-secondary {
+        color: #475569;
+        border-color: rgba(148, 163, 184, 0.6);
+      }
+      .btn-outline-secondary:hover {
+        background-color: #f8fbff;
+        color: var(--gg-text);
+        border-color: rgba(148, 163, 184, 0.8);
+      }
+      .btn-outline-danger {
+        color: #dc2626;
+        border-color: rgba(248, 113, 113, 0.6);
+      }
+      .btn-outline-danger:hover {
+        background-color: rgba(248, 113, 113, 0.12);
+        color: #dc2626;
+      }
+
+      /* ── Modals ── */
+      .modal-content {
+        background: rgba(255, 255, 255, 0.98);
+        border: 1px solid rgba(219, 234, 254, 0.9);
+        border-radius: 1rem;
+        box-shadow: 0 16px 50px rgba(59, 130, 246, 0.12);
+      }
+      .modal-header,
+      .modal-footer {
+        border-color: rgba(219, 234, 254, 0.9);
+      }
+      .modal-title {
+        color: #0f172a;
+      }
+
+      /* ── Table hover ── */
+      .table-hover tbody tr:hover {
+        background-color: rgba(59, 130, 246, 0.08);
+      }
+
+      /* ── Badge overrides ── */
+      .badge.bg-secondary {
+        background-color: rgba(148, 163, 184, 0.18) !important;
+        color: #475569 !important;
+      }
+      .badge.bg-success {
+        background-color: rgba(22, 163, 74, 0.16) !important;
+        color: #166534 !important;
+      }
+      .badge.bg-info {
+        background-color: rgba(56, 189, 248, 0.16) !important;
+        color: #0369a1 !important;
+      }
+      .badge.bg-warning {
+        background-color: rgba(251, 191, 36, 0.16) !important;
+        color: #92400e !important;
+      }
+      .badge.bg-danger {
+        background-color: rgba(248, 113, 113, 0.16) !important;
+        color: #b91c1c !important;
+      }
+      /* ── Badges ── */
+      .badge.bg-primary {
+        background-color: rgba(59, 130, 246, 0.12) !important;
+        color: #1d4ed8 !important;
+      }
+      .badge.bg-success {
+        background-color: rgba(22, 163, 74, 0.12) !important;
+        color: #166534 !important;
+      }
+      .badge.bg-warning {
+        background-color: rgba(245, 158, 11, 0.18) !important;
+        color: #92400e !important;
+      }
+      .badge.bg-danger {
+        background-color: rgba(248, 113, 113, 0.18) !important;
+        color: #b91c1c !important;
+      }
+      .progress {
+        background-color: rgba(219, 234, 254, 0.85);
+      }
+      .progress-bar {
+        background: linear-gradient(135deg, #2563eb, #3b82f6);
+      }
+
+      /* ── Pagination ── */
+      .page-link {
+        background-color: #ffffff;
+        border-color: rgba(219, 234, 254, 0.9);
+        color: var(--gg-text);
+      }
+      .page-link:hover {
+        background-color: var(--gg-accent);
+        border-color: var(--gg-accent);
+        color: #fff;
+      }
+      .page-item.active .page-link {
+        background-color: var(--gg-accent);
+        border-color: var(--gg-accent);
+      }
+      .page-item.disabled .page-link {
+        background-color: #f8fbff;
+        border-color: rgba(219, 234, 254, 0.9);
+        color: var(--gg-muted);
+      }
+
+      /* ── Alerts ── */
+      .alert-danger {
+        background-color: rgba(254, 226, 226, 0.8);
+        border-color: rgba(248, 113, 113, 0.5);
+        color: #b91c1c;
+      }
+      .alert-success {
+        background-color: rgba(220, 252, 231, 0.8);
+        border-color: rgba(22, 163, 74, 0.5);
+        color: #166534;
+      }
+      .alert-warning {
+        background-color: rgba(254, 243, 199, 0.8);
+        border-color: rgba(245, 158, 11, 0.5);
+        color: #92400e;
+      }
+      .alert-info {
+        background-color: rgba(219, 234, 254, 0.8);
+        border-color: rgba(59, 130, 246, 0.5);
+        color: #1d4ed8;
+      }
+
+      /* ── Text helpers ── */
+      .text-muted {
+        color: var(--gg-muted) !important;
+      }
+
+      /* ── Input group ── */
+      .input-group-text {
+        background-color: #f8fbff;
+        border-color: rgba(219, 234, 254, 0.9);
+        color: #64748b;
+      }
+
+      /* ── Scrollbar ── */
+      ::-webkit-scrollbar {
+        width: 6px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #f8fbff;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: rgba(96, 165, 250, 0.6);
+        border-radius: 3px;
+      }
     </style>
     {% block extra_head %}{% endblock %}
-</head>
-<body>
-<div class="container-fluid p-0">
-    <div class="row g-0">
+  </head>
+  <body>
+    <div class="container-fluid p-0">
+      <div class="row g-0">
         <!-- Sidebar -->
         <div class="col-md-2 sidebar p-3 d-none d-md-block">
-            <div class="brand mb-4 ps-2">
-                <i class="bi bi-heart-pulse-fill me-2"></i>1000 HPK
-            </div>
-            <nav class="nav flex-column gap-1">
-                <a class="nav-link {% if request.endpoint == 'anak.dashboard' %}active{% endif %}"
-                   href="{{ url_for('anak.dashboard') }}">
-                    <i class="bi bi-speedometer2 me-2"></i>Dashboard
-                </a>
-                <a class="nav-link {% if request.endpoint and 'anak.' in request.endpoint and request.endpoint != 'anak.dashboard' %}active{% endif %}"
-                   href="{{ url_for('anak.list_anak') }}">
-                    <i class="bi bi-people-fill me-2"></i>Data Anak
-                </a>
-                <a class="nav-link {% if request.endpoint and 'imunisasi.' in request.endpoint %}active{% endif %}"
-                   href="{{ url_for('imunisasi.list_imunisasi') }}">
-                    <i class="bi bi-clipboard2-pulse me-2"></i>Imunisasi
-                </a>
-                <a class="nav-link {% if request.endpoint and 'notifikasi.' in request.endpoint %}active{% endif %}"
-                   href="{{ url_for('notifikasi.index') }}">
-                    <i class="bi bi-whatsapp me-2"></i>Notifikasi WA
-                </a>
-                <a class="nav-link {% if request.endpoint and 'edukasi.' in request.endpoint %}active{% endif %}"
-                   href="{{ url_for('edukasi.index') }}">
-                    <i class="bi bi-book me-2"></i>Edukasi
-                </a>
-                {% if current_user.is_authenticated and current_user.role == 'admin' %}
-                <a class="nav-link {% if request.endpoint and 'laporan.' in request.endpoint %}active{% endif %}"
-                   href="{{ url_for('laporan.index') }}">
-                    <i class="bi bi-file-earmark-bar-graph me-2"></i>Laporan
-                </a>
-                <a class="nav-link {% if request.endpoint and 'auth.' in request.endpoint %}active{% endif %}"
-                   href="{{ url_for('auth.admin_users') }}">
-                    <i class="bi bi-person-gear me-2"></i>Manajemen User
-                </a>
-                {% endif %}
-            </nav>
+          <div class="brand mb-4 ps-1 d-flex align-items-center gap-2">
+            <img
+              src="{{ url_for('static', filename='img/logo.png.png') }}"
+              alt="1000 HPK"
+              style="width: 36px; height: 36px; object-fit: contain"
+            />
+            <span style="-webkit-text-fill-color: white; font-weight: 800"
+              >1000 HPK</span
+            >
+          </div>
+          <nav class="nav flex-column gap-1">
+            <a
+              class="nav-link {% if request.endpoint == 'anak.dashboard' %}active{% endif %}"
+              href="{{ url_for('anak.dashboard') }}"
+            >
+              <i class="bi bi-speedometer2 me-2"></i>Dashboard
+            </a>
+            <a
+              class="nav-link {% if request.endpoint and 'anak.' in request.endpoint and request.endpoint != 'anak.dashboard' %}active{% endif %}"
+              href="{{ url_for('anak.list_anak') }}"
+            >
+              <i class="bi bi-people-fill me-2"></i>Data Anak
+            </a>
+            <a
+              class="nav-link {% if request.endpoint and 'imunisasi.' in request.endpoint %}active{% endif %}"
+              href="{{ url_for('imunisasi.list_imunisasi') }}"
+            >
+              <i class="bi bi-clipboard2-pulse me-2"></i>Imunisasi
+            </a>
+            <a
+              class="nav-link {% if request.endpoint and 'notifikasi.' in request.endpoint %}active{% endif %}"
+              href="{{ url_for('notifikasi.index') }}"
+            >
+              <i class="bi bi-whatsapp me-2"></i>Notifikasi WA
+            </a>
+            <a
+              class="nav-link {% if request.endpoint and 'edukasi.' in request.endpoint %}active{% endif %}"
+              href="{{ url_for('edukasi.index') }}"
+            >
+              <i class="bi bi-book me-2"></i>Edukasi
+            </a>
+            {% if current_user.is_authenticated and current_user.role == 'admin'
+            %}
+            <hr class="sidebar-divider" />
+            <a
+              class="nav-link {% if request.endpoint and 'laporan.' in request.endpoint %}active{% endif %}"
+              href="{{ url_for('laporan.index') }}"
+            >
+              <i class="bi bi-file-earmark-bar-graph me-2"></i>Laporan
+            </a>
+            <a
+              class="nav-link {% if request.endpoint and 'auth.' in request.endpoint %}active{% endif %}"
+              href="{{ url_for('auth.admin_users') }}"
+            >
+              <i class="bi bi-person-gear me-2"></i>Manajemen User
+            </a>
+            {% endif %}
+          </nav>
         </div>
 
         <!-- Main content -->
         <div class="col-md-10 main-content">
-            <!-- Topbar -->
-            <nav class="navbar navbar-expand-md navbar-light bg-white border-bottom px-4 py-2">
-                <button class="navbar-toggler d-md-none me-2" type="button" data-bs-toggle="collapse"
-                        data-bs-target="#sidebarMobile">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <span class="navbar-brand fw-bold text-primary d-md-none">1000 HPK</span>
-                <div class="ms-auto d-flex align-items-center gap-3">
-                    {% if current_user.is_authenticated %}
-                    <span class="text-muted small">
-                        <i class="bi bi-person-circle me-1"></i>
-                        {{ current_user.nama_lengkap }}
-                        <span class="badge bg-secondary ms-1">{{ current_user.role }}</span>
-                    </span>
-                    <a href="{{ url_for('auth.logout') }}" class="btn btn-sm btn-outline-danger">
-                        <i class="bi bi-box-arrow-right me-1"></i>Logout
-                    </a>
-                    {% endif %}
-                </div>
+          <!-- Topbar -->
+          <nav class="topbar navbar navbar-expand-md px-4 py-2">
+            <button
+              class="navbar-toggler d-md-none me-2 border-0"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#sidebarMobile"
+              style="color: var(--gg-text)"
+            >
+              <i class="bi bi-list fs-5"></i>
+            </button>
+            <span class="brand-mobile fw-bold d-md-none"
+              >Golden Generation</span
+            >
+            <div class="ms-auto d-flex align-items-center gap-3">
+              {% if current_user.is_authenticated %}
+              <span class="small" style="color: var(--gg-muted)">
+                <i class="bi bi-person-circle me-1"></i>
+                {{ current_user.nama_lengkap }}
+                <span
+                  class="badge ms-1"
+                  style="
+                    background: var(--gg-surface2);
+                    color: var(--gg-muted);
+                    border: 1px solid var(--gg-border);
+                  "
+                  >{{ current_user.role }}</span
+                >
+              </span>
+              <a
+                href="{{ url_for('auth.logout') }}"
+                class="btn btn-sm btn-outline-danger"
+              >
+                <i class="bi bi-box-arrow-right me-1"></i>Logout
+              </a>
+              {% endif %}
+            </div>
+          </nav>
+
+          <!-- Mobile sidebar -->
+          <div
+            class="collapse d-md-none p-3"
+            id="sidebarMobile"
+            style="background: var(--gg-surface)"
+          >
+            <nav class="nav flex-column gap-1">
+              <a
+                class="nav-link"
+                href="{{ url_for('anak.dashboard') }}"
+                style="color: var(--gg-text)"
+              >
+                <i class="bi bi-speedometer2 me-2"></i>Dashboard
+              </a>
+              <a
+                class="nav-link"
+                href="{{ url_for('anak.list_anak') }}"
+                style="color: var(--gg-text)"
+              >
+                <i class="bi bi-people-fill me-2"></i>Data Anak
+              </a>
+              <a
+                class="nav-link"
+                href="{{ url_for('imunisasi.list_imunisasi') }}"
+                style="color: var(--gg-text)"
+              >
+                <i class="bi bi-clipboard2-pulse me-2"></i>Imunisasi
+              </a>
+              <a
+                class="nav-link"
+                href="{{ url_for('notifikasi.index') }}"
+                style="color: var(--gg-text)"
+              >
+                <i class="bi bi-whatsapp me-2"></i>Notifikasi WA
+              </a>
+              <a
+                class="nav-link"
+                href="{{ url_for('edukasi.index') }}"
+                style="color: var(--gg-text)"
+              >
+                <i class="bi bi-book me-2"></i>Edukasi
+              </a>
             </nav>
+          </div>
 
-            <!-- Mobile sidebar -->
-            <div class="collapse d-md-none bg-primary p-3" id="sidebarMobile">
-                <nav class="nav flex-column gap-1">
-                    <a class="nav-link text-white" href="{{ url_for('anak.dashboard') }}">
-                        <i class="bi bi-speedometer2 me-2"></i>Dashboard
-                    </a>
-                    <a class="nav-link text-white" href="{{ url_for('anak.list_anak') }}">
-                        <i class="bi bi-people-fill me-2"></i>Data Anak
-                    </a>
-                </nav>
+          <!-- Flash messages -->
+          <div class="px-4 pt-3">
+            {% with messages = get_flashed_messages(with_categories=true) %} {%
+            if messages %} {% for category, message in messages %}
+            <div
+              class="alert alert-{{ category }} alert-dismissible fade show"
+              role="alert"
+            >
+              {{ message }}
+              <button
+                type="button"
+                class="btn-close btn-close-white"
+                data-bs-dismiss="alert"
+              ></button>
             </div>
+            {% endfor %} {% endif %} {% endwith %}
+          </div>
 
-            <!-- Flash messages -->
-            <div class="px-4 pt-3">
-                {% with messages = get_flashed_messages(with_categories=true) %}
-                  {% if messages %}
-                    {% for category, message in messages %}
-                      <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                          {{ message }}
-                          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                      </div>
-                    {% endfor %}
-                  {% endif %}
-                {% endwith %}
-            </div>
-
-            <!-- Page content -->
-            <div class="p-4">
-                {% block content %}{% endblock %}
-            </div>
+          <!-- Page content -->
+          <div class="p-4">{% block content %}{% endblock %}</div>
         </div>
+      </div>
     </div>
-</div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
-{% block extra_scripts %}{% endblock %}
-</body>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+    {% block extra_scripts %}{% endblock %}
+  </body>
 </html>
