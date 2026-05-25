@@ -1,6 +1,16 @@
 {% extends "portal/base.html" %} {% block title %}Daftar Akun{% endblock %} {%
 block extra_head %}
 <style>
+  body {
+    background: linear-gradient(135deg, #7c1d6f 0%, #be185d 40%, #f43f5e 100%) !important;
+    background-size: 400% 400% !important;
+    animation: gradientShift 10s ease infinite !important;
+  }
+  @keyframes gradientShift {
+    0%   { background-position: 0% 50%; }
+    50%  { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
   .register-wrapper {
     min-height: calc(100vh - 56px - 56px);
     display: flex;
