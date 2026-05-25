@@ -34,25 +34,32 @@ block extra_head %}
   .register-card .text-muted { color: rgba(255,255,255,0.7) !important; }
   .register-card .form-control,
   .register-card .form-select {
-    background-color: rgba(255,255,255,0.15);
-    border-color: rgba(255,255,255,0.25);
-    color: #fff;
+    background-color: rgba(255,255,255,0.15) !important;
+    border-color: rgba(255,255,255,0.3) !important;
+    color: #fff !important;
   }
-  .register-card .form-control::placeholder { color: rgba(255,255,255,0.5); }
+  .register-card .form-control::placeholder { color: rgba(255,255,255,0.5) !important; }
   .register-card .form-control:focus,
   .register-card .form-select:focus {
-    background-color: rgba(255,255,255,0.22);
-    border-color: rgba(255,255,255,0.6);
-    color: #fff;
-    box-shadow: 0 0 0 0.2rem rgba(255,255,255,0.15);
+    background-color: rgba(255,255,255,0.25) !important;
+    border-color: rgba(255,255,255,0.6) !important;
+    color: #fff !important;
+    box-shadow: 0 0 0 0.2rem rgba(255,255,255,0.15) !important;
   }
   .register-card .input-group-text {
-    background-color: rgba(255,255,255,0.15);
-    border-color: rgba(255,255,255,0.25);
-    color: rgba(255,255,255,0.8);
+    background-color: rgba(255,255,255,0.15) !important;
+    border-color: rgba(255,255,255,0.3) !important;
+    color: rgba(255,255,255,0.85) !important;
   }
-  .register-card a { color: rgba(255,255,255,0.9); }
-  .register-card a:hover { color: #fff; }
+  .register-card .form-text { color: rgba(255,255,255,0.65) !important; }
+  .register-card a { color: rgba(255,255,255,0.9) !important; }
+  .register-card a:hover { color: #fff !important; }
+  .register-card .btn-primary {
+    background: linear-gradient(135deg, #ec4899, #f43f5e) !important;
+    border: none !important;
+    color: #fff !important;
+    font-weight: 700;
+  }
 </style>
 {% endblock %} {% block content %}
 <div class="register-wrapper">
