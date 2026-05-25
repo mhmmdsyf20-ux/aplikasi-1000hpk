@@ -14,7 +14,7 @@ from datetime import date
 from blueprints.notifikasi import notifikasi_bp
 from models import Anak, NotifikasiLog, Imunisasi
 from services.master_service import master_only
-from services.imunisasi_service import get_imunisasi_mendatang
+from services.imunisasi_service import get_imunisasi_mendatang, update_status_terlewat
 from services.wa_service import format_pesan_wa, kirim_dan_log
 
 
@@ -22,6 +22,9 @@ from services.wa_service import format_pesan_wa, kirim_dan_log
 @master_only
 def index():
     """Halaman notifikasi: jadwal mendatang, imunisasi terlewat, dan riwayat log."""
+    # Update status terlewat setiap kali halaman dibuka
+    update_status_terlewat()
+
     mendatang = get_imunisasi_mendatang(days=7)
 
     # Ambil semua imunisasi terlewat
