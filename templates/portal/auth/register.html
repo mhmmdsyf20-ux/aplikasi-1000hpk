@@ -70,6 +70,62 @@ block extra_head %}
     color: #fff !important;
     font-weight: 700;
   }
+
+  /* Contrast refresh */
+  body {
+    background: linear-gradient(180deg, #fff8fb 0%, #f8f5ff 100%) !important;
+    animation: none !important;
+    color: #251722;
+  }
+  .register-card {
+    background: #ffffff !important;
+    border: 1px solid #ead6df !important;
+    box-shadow: 0 18px 45px rgba(63, 24, 48, 0.14);
+  }
+  .register-icon {
+    background: #fce7f3;
+    color: #be185d;
+  }
+  .register-card h5,
+  .register-card label,
+  .register-card p,
+  .register-card .form-label,
+  .register-card .card-body {
+    color: #251722 !important;
+  }
+  .register-card .text-muted,
+  .register-card .form-text {
+    color: #6f5d67 !important;
+  }
+  .register-card .form-control,
+  .register-card .form-select {
+    background-color: #ffffff !important;
+    border-color: #d8c2ce !important;
+    color: #251722 !important;
+  }
+  .register-card .form-control::placeholder { color: #9b8792 !important; }
+  .register-card .form-control:focus,
+  .register-card .form-select:focus {
+    background-color: #ffffff !important;
+    border-color: #be185d !important;
+    color: #251722 !important;
+    box-shadow: 0 0 0 0.2rem rgba(190, 24, 93, 0.16) !important;
+  }
+  .register-card .input-group-text {
+    background-color: #fff1f6 !important;
+    border-color: #d8c2ce !important;
+    color: #6f5d67 !important;
+  }
+  .register-card a { color: #be185d !important; }
+  .register-card a:hover { color: #9f1239 !important; }
+  .register-card .btn-primary {
+    background: #be185d !important;
+    border-color: #be185d !important;
+  }
+  .register-card .btn-primary:hover {
+    background: #9f1239 !important;
+    border-color: #9f1239 !important;
+  }
 </style>
 {% endblock %} {% block content %}
 <div class="register-wrapper">

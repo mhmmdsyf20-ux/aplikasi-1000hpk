@@ -4,7 +4,7 @@ blueprints/imunisasi/routes.py — Route manajemen jadwal imunisasi.
 Routes:
     GET  /imunisasi/                  — Daftar semua jadwal (filter status)
     POST /imunisasi/<id>/selesai      — Tandai imunisasi selesai
-    GET  /imunisasi/mendatang         — Imunisasi 7 hari ke depan
+    GET  /imunisasi/mendatang         — Imunisasi 30 hari ke depan
 """
 
 from datetime import datetime
@@ -113,8 +113,8 @@ def tandai_imunisasi_selesai(imunisasi_id):
 @imunisasi_bp.route("/mendatang")
 @master_only
 def imunisasi_mendatang():
-    """Daftar imunisasi yang jatuh tempo dalam 7 hari ke depan."""
+    """Daftar imunisasi yang jatuh tempo dalam 30 hari ke depan."""
     update_status_terlewat()
-    mendatang = get_imunisasi_mendatang(days=7)
+    mendatang = get_imunisasi_mendatang(days=30)
 
     return render_template("imunisasi/mendatang.html", mendatang=mendatang)

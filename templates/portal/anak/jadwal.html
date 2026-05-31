@@ -1,224 +1,236 @@
-{% extends "portal/base.html" %}
-
-{% block title %}Jadwal — {{ anak.nama }}{% endblock %}
-
-{% block content %}
+{% extends "portal/base.html" %} {% block title %}Jadwal — {{ anak.nama }}{%
+endblock %} {% block content %}
 <!-- Page Header -->
-<div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
-    <div>
-        <h4 class="mb-0 fw-bold">
-            <i class="bi bi-calendar3 me-2 text-primary"></i>Jadwal Imunisasi
-        </h4>
-        <small class="text-muted">{{ anak.nama }}</small>
-    </div>
-    <a href="{{ url_for('portal.portal_detail_anak', anak_id=anak.id) }}"
-       class="btn btn-outline-secondary btn-sm">
-        <i class="bi bi-arrow-left me-1"></i>Kembali ke Detail Anak
-    </a>
+<div
+  class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2"
+>
+  <div>
+    <h4 class="mb-0 fw-bold">
+      <i class="bi bi-calendar3 me-2 text-primary"></i>Jadwal Imunisasi
+    </h4>
+    <small class="text-muted">{{ anak.nama }}</small>
+  </div>
+  <a
+    href="{{ url_for('portal.portal_detail_anak', anak_id=anak.id) }}"
+    class="btn btn-outline-secondary btn-sm"
+  >
+    <i class="bi bi-arrow-left me-1"></i>Kembali ke Detail Anak
+  </a>
 </div>
 
 <!-- Ringkasan Imunisasi -->
 <div class="card border-0 shadow-sm mb-4">
-    <div class="card-body">
-        <div class="row align-items-center g-3">
-            <div class="col-12 col-md-6">
-                <h5 class="fw-semibold mb-1">
-                    <i class="bi bi-person-fill me-2 text-primary"></i>{{ anak.nama }}
-                </h5>
-                <p class="text-muted mb-0 small">
-                    {{ selesai }} dari {{ total }} jadwal imunisasi selesai
-                </p>
-            </div>
-            <div class="col-12 col-md-6">
-                <div class="d-flex justify-content-between align-items-center mb-1">
-                    <span class="small text-muted">Kelengkapan Imunisasi</span>
-                    <span class="fw-semibold small">{{ "%.1f"|format(persen) }}%</span>
-                </div>
-                <div class="progress" style="height: 10px;" role="progressbar"
-                     aria-valuenow="{{ persen|int }}" aria-valuemin="0" aria-valuemax="100"
-                     aria-label="Persentase kelengkapan imunisasi {{ anak.nama }}">
-                    <div class="progress-bar
-                        {% if persen >= 80 %}bg-success
-                        {% elif persen >= 50 %}bg-warning
-                        {% else %}bg-danger{% endif %}"
-                         style="width: {{ persen }}%">
-                    </div>
-                </div>
-            </div>
+  <div class="card-body">
+    <div class="row align-items-center g-3">
+      <div class="col-12 col-md-6">
+        <h5 class="fw-semibold mb-1">
+          <i class="bi bi-person-fill me-2 text-primary"></i>{{ anak.nama }}
+        </h5>
+        <p class="text-muted mb-0 small">
+          {{ selesai }} dari {{ total }} jadwal imunisasi selesai
+        </p>
+      </div>
+      <div class="col-12 col-md-6">
+        <div class="d-flex justify-content-between align-items-center mb-1">
+          <span class="small text-muted">Kelengkapan Imunisasi</span>
+          <span class="fw-semibold small">{{ "%.1f"|format(persen) }}%</span>
         </div>
-
-        <!-- Statistik Ringkas -->
-        <div class="row g-2 mt-2">
-            <div class="col-4 text-center">
-                <div class="border rounded p-2">
-                    <div class="fw-bold fs-5 text-primary">{{ total }}</div>
-                    <div class="small text-muted">Total</div>
-                </div>
-            </div>
-            <div class="col-4 text-center">
-                <div class="border rounded p-2">
-                    <div class="fw-bold fs-5 text-success">{{ selesai }}</div>
-                    <div class="small text-muted">Selesai</div>
-                </div>
-            </div>
-            <div class="col-4 text-center">
-                <div class="border rounded p-2">
-                    <div class="fw-bold fs-5 text-secondary">{{ total - selesai }}</div>
-                    <div class="small text-muted">Belum</div>
-                </div>
-            </div>
+        <div
+          class="progress"
+          style="height: 10px"
+          role="progressbar"
+          aria-valuenow="{{ persen|int }}"
+          aria-valuemin="0"
+          aria-valuemax="100"
+          aria-label="Persentase kelengkapan imunisasi {{ anak.nama }}"
+        >
+          <div
+            class="progress-bar {% if persen >= 80 %}bg-success {% elif persen >= 50 %}bg-warning {% else %}bg-danger{% endif %}"
+            style="width: {{ persen }}%"
+          ></div>
         </div>
+      </div>
     </div>
+
+    <!-- Statistik Ringkas -->
+    <div class="row g-2 mt-2">
+      <div class="col-4 text-center">
+        <div class="border rounded p-2">
+          <div class="fw-bold fs-5 text-primary">{{ total }}</div>
+          <div class="small text-muted">Total</div>
+        </div>
+      </div>
+      <div class="col-4 text-center">
+        <div class="border rounded p-2">
+          <div class="fw-bold fs-5 text-success">{{ selesai }}</div>
+          <div class="small text-muted">Selesai</div>
+        </div>
+      </div>
+      <div class="col-4 text-center">
+        <div class="border rounded p-2">
+          <div class="fw-bold fs-5 text-secondary">{{ total - selesai }}</div>
+          <div class="small text-muted">Belum</div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- Seksi: Mendatang -->
 <div class="card border-0 shadow-sm mb-4">
-    <div class="card-header bg-white border-bottom py-3">
-        <h5 class="mb-0 fw-semibold">
-            <i class="bi bi-alarm me-2 text-warning"></i>Mendatang
-            <span class="badge bg-warning text-dark ms-2">{{ mendatang|length }}</span>
-        </h5>
-        <small class="text-muted">Jadwal imunisasi dalam 7 hari ke depan</small>
+  <div class="card-header bg-white border-bottom py-3">
+    <h5 class="mb-0 fw-semibold">
+      <i class="bi bi-alarm me-2 text-warning"></i>Mendatang
+      <span class="badge bg-warning text-dark ms-2"
+        >{{ mendatang|length }}</span
+      >
+    </h5>
+    <small class="text-muted">Jadwal imunisasi dalam 30 hari ke depan</small>
+  </div>
+  <div class="card-body p-0">
+    {% if mendatang %}
+    <div class="table-responsive">
+      <table class="table table-hover mb-0 align-middle">
+        <thead class="table-light">
+          <tr>
+            <th scope="col">Vaksin</th>
+            <th scope="col">Tanggal Jadwal</th>
+            <th scope="col">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for jadwal in mendatang %}
+          <tr>
+            <td class="fw-semibold">{{ jadwal.nama_vaksin }}</td>
+            <td>{{ jadwal.tanggal_jadwal.strftime('%d %B %Y') }}</td>
+            <td>
+              <span class="badge bg-primary">Terjadwal</span>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
     </div>
-    <div class="card-body p-0">
-        {% if mendatang %}
-        <div class="table-responsive">
-            <table class="table table-hover mb-0 align-middle">
-                <thead class="table-light">
-                    <tr>
-                        <th scope="col">Vaksin</th>
-                        <th scope="col">Tanggal Jadwal</th>
-                        <th scope="col">Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for jadwal in mendatang %}
-                    <tr>
-                        <td class="fw-semibold">{{ jadwal.nama_vaksin }}</td>
-                        <td>{{ jadwal.tanggal_jadwal.strftime('%d %B %Y') }}</td>
-                        <td>
-                            <span class="badge bg-primary">Terjadwal</span>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        {% else %}
-        <div class="p-3">
-            <p class="text-muted small mb-0">
-                <i class="bi bi-info-circle me-1"></i>Tidak ada jadwal di kategori ini.
-            </p>
-        </div>
-        {% endif %}
+    {% else %}
+    <div class="p-3">
+      <p class="text-muted small mb-0">
+        <i class="bi bi-info-circle me-1"></i>Tidak ada jadwal di kategori ini.
+      </p>
     </div>
+    {% endif %}
+  </div>
 </div>
 
 <!-- Seksi: Terjadwal -->
 <div class="card border-0 shadow-sm mb-4">
-    <div class="card-header bg-white border-bottom py-3">
-        <h5 class="mb-0 fw-semibold">
-            <i class="bi bi-calendar-check me-2 text-primary"></i>Terjadwal
-            <span class="badge bg-primary ms-2">{{ terjadwal|length }}</span>
-        </h5>
-        <small class="text-muted">Jadwal imunisasi lebih dari 7 hari ke depan</small>
+  <div class="card-header bg-white border-bottom py-3">
+    <h5 class="mb-0 fw-semibold">
+      <i class="bi bi-calendar-check me-2 text-primary"></i>Terjadwal
+      <span class="badge bg-primary ms-2">{{ terjadwal|length }}</span>
+    </h5>
+    <small class="text-muted"
+      >Jadwal imunisasi lebih dari 30 hari ke depan</small
+    >
+  </div>
+  <div class="card-body p-0">
+    {% if terjadwal %}
+    <div class="table-responsive">
+      <table class="table table-hover mb-0 align-middle">
+        <thead class="table-light">
+          <tr>
+            <th scope="col">Vaksin</th>
+            <th scope="col">Tanggal Jadwal</th>
+            <th scope="col">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for jadwal in terjadwal %}
+          <tr>
+            <td class="fw-semibold">{{ jadwal.nama_vaksin }}</td>
+            <td>{{ jadwal.tanggal_jadwal.strftime('%d %B %Y') }}</td>
+            <td>
+              <span class="badge bg-primary">Terjadwal</span>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
     </div>
-    <div class="card-body p-0">
-        {% if terjadwal %}
-        <div class="table-responsive">
-            <table class="table table-hover mb-0 align-middle">
-                <thead class="table-light">
-                    <tr>
-                        <th scope="col">Vaksin</th>
-                        <th scope="col">Tanggal Jadwal</th>
-                        <th scope="col">Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for jadwal in terjadwal %}
-                    <tr>
-                        <td class="fw-semibold">{{ jadwal.nama_vaksin }}</td>
-                        <td>{{ jadwal.tanggal_jadwal.strftime('%d %B %Y') }}</td>
-                        <td>
-                            <span class="badge bg-primary">Terjadwal</span>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        {% else %}
-        <div class="p-3">
-            <p class="text-muted small mb-0">
-                <i class="bi bi-info-circle me-1"></i>Tidak ada jadwal di kategori ini.
-            </p>
-        </div>
-        {% endif %}
+    {% else %}
+    <div class="p-3">
+      <p class="text-muted small mb-0">
+        <i class="bi bi-info-circle me-1"></i>Tidak ada jadwal di kategori ini.
+      </p>
     </div>
+    {% endif %}
+  </div>
 </div>
 
 <!-- Seksi: Riwayat -->
 <div class="card border-0 shadow-sm mb-4">
-    <div class="card-header bg-white border-bottom py-3">
-        <h5 class="mb-0 fw-semibold">
-            <i class="bi bi-clock-history me-2 text-secondary"></i>Riwayat
-            <span class="badge bg-secondary ms-2">{{ riwayat|length }}</span>
-        </h5>
-        <small class="text-muted">Jadwal imunisasi yang sudah selesai atau terlewat</small>
+  <div class="card-header bg-white border-bottom py-3">
+    <h5 class="mb-0 fw-semibold">
+      <i class="bi bi-clock-history me-2 text-secondary"></i>Riwayat
+      <span class="badge bg-secondary ms-2">{{ riwayat|length }}</span>
+    </h5>
+    <small class="text-muted"
+      >Jadwal imunisasi yang sudah selesai atau terlewat</small
+    >
+  </div>
+  <div class="card-body p-0">
+    {% if riwayat %}
+    <div class="table-responsive">
+      <table class="table table-hover mb-0 align-middle">
+        <thead class="table-light">
+          <tr>
+            <th scope="col">Vaksin</th>
+            <th scope="col">Tanggal Jadwal</th>
+            <th scope="col">Status</th>
+            <th scope="col">Tanggal Realisasi</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for jadwal in riwayat %}
+          <tr>
+            <td class="fw-semibold">{{ jadwal.nama_vaksin }}</td>
+            <td>{{ jadwal.tanggal_jadwal.strftime('%d %B %Y') }}</td>
+            <td>
+              {% if jadwal.status == 'selesai' %}
+              <span class="badge bg-success">Selesai</span>
+              {% elif jadwal.status == 'terlewat' %}
+              <span class="badge bg-danger">Terlewat</span>
+              {% else %}
+              <span class="badge bg-primary">Terjadwal</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if jadwal.status == 'selesai' and jadwal.tanggal_realisasi %}
+              {{ jadwal.tanggal_realisasi.strftime('%d %B %Y') }} {% else %}
+              <span class="text-muted">—</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
     </div>
-    <div class="card-body p-0">
-        {% if riwayat %}
-        <div class="table-responsive">
-            <table class="table table-hover mb-0 align-middle">
-                <thead class="table-light">
-                    <tr>
-                        <th scope="col">Vaksin</th>
-                        <th scope="col">Tanggal Jadwal</th>
-                        <th scope="col">Status</th>
-                        <th scope="col">Tanggal Realisasi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for jadwal in riwayat %}
-                    <tr>
-                        <td class="fw-semibold">{{ jadwal.nama_vaksin }}</td>
-                        <td>{{ jadwal.tanggal_jadwal.strftime('%d %B %Y') }}</td>
-                        <td>
-                            {% if jadwal.status == 'selesai' %}
-                                <span class="badge bg-success">Selesai</span>
-                            {% elif jadwal.status == 'terlewat' %}
-                                <span class="badge bg-danger">Terlewat</span>
-                            {% else %}
-                                <span class="badge bg-primary">Terjadwal</span>
-                            {% endif %}
-                        </td>
-                        <td>
-                            {% if jadwal.status == 'selesai' and jadwal.tanggal_realisasi %}
-                                {{ jadwal.tanggal_realisasi.strftime('%d %B %Y') }}
-                            {% else %}
-                                <span class="text-muted">—</span>
-                            {% endif %}
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        {% else %}
-        <div class="p-3">
-            <p class="text-muted small mb-0">
-                <i class="bi bi-info-circle me-1"></i>Tidak ada jadwal di kategori ini.
-            </p>
-        </div>
-        {% endif %}
+    {% else %}
+    <div class="p-3">
+      <p class="text-muted small mb-0">
+        <i class="bi bi-info-circle me-1"></i>Tidak ada jadwal di kategori ini.
+      </p>
     </div>
+    {% endif %}
+  </div>
 </div>
 
 <!-- Tombol Kembali -->
 <div class="mt-2">
-    <a href="{{ url_for('portal.portal_detail_anak', anak_id=anak.id) }}"
-       class="btn btn-outline-secondary">
-        <i class="bi bi-arrow-left me-1"></i>Kembali ke Detail Anak
-    </a>
+  <a
+    href="{{ url_for('portal.portal_detail_anak', anak_id=anak.id) }}"
+    class="btn btn-outline-secondary"
+  >
+    <i class="bi bi-arrow-left me-1"></i>Kembali ke Detail Anak
+  </a>
 </div>
 {% endblock %}

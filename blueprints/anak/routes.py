@@ -9,6 +9,8 @@ Routes:
     GET      /anak/<id>               — Detail anak + daftar imunisasi
 """
 
+import csv
+import io
 from datetime import date, timedelta, datetime
 
 from flask import render_template, redirect, url_for, flash, request
@@ -23,6 +25,71 @@ from services.imunisasi_service import generate_jadwal_imunisasi, update_status_
 _HAS_IMUNISASI_SERVICE = True
 
 
+IMPORT_ANAK_HEADERS = [
+    'nama',
+    'tanggal_lahir',
+    'jenis_kelamin',
+    'nama_ibu',
+    'no_hp_ortu',
+    'alamat',
+    'berat_lahir',
+    'panjang_lahir',
+]
+
+
+def _normalize_import_cell(value):
+    """Convert CSV/Excel cell values into strings used by existing validation."""
+    if value is None:
+        return ''
+    if isinstance(value, datetime):
+        return value.date().isoformat()
+    if isinstance(value, date):
+        return value.isoformat()
+    return str(value).strip()
+
+
+def _read_import_rows(file):
+    """Return (fieldnames, [(row_index, row_dict), ...]) from CSV or Excel upload."""
+    filename = file.filename.lower()
+
+    if filename.endswith('.csv'):
+        stream = io.TextIOWrapper(file.stream, encoding='utf-8-sig')
+        reader = csv.DictReader(stream)
+        rows = []
+        for row_index, raw_row in enumerate(reader, start=2):
+            row = {
+                key.strip().lower(): _normalize_import_cell(value)
+                for key, value in raw_row.items()
+                if key
+            }
+            rows.append((row_index, row))
+        return reader.fieldnames, rows
+
+    if filename.endswith(('.xlsx', '.xlsm')):
+        from openpyxl import load_workbook
+
+        workbook = load_workbook(file.stream, read_only=True, data_only=True)
+        sheet = workbook.active
+        row_values = sheet.iter_rows(values_only=True)
+        header_row = next(row_values, None)
+        if not header_row:
+            return None, []
+
+        fieldnames = [_normalize_import_cell(value) for value in header_row]
+        headers = [header.strip().lower() for header in fieldnames]
+        rows = []
+        for row_index, values in enumerate(row_values, start=2):
+            row = {
+                header: _normalize_import_cell(value)
+                for header, value in zip(headers, values)
+                if header
+            }
+            rows.append((row_index, row))
+        return fieldnames, rows
+
+    raise ValueError('unsupported_file_type')
+
+
 # ─────────────────────────────────────────────────────────────────────────────
 # Dashboard
 # ─────────────────────────────────────────────────────────────────────────────
@@ -35,7 +102,7 @@ def dashboard():
     update_status_terlewat()
 
     today = date.today()
-    next_7 = today + timedelta(days=7)
+    next_30 = today + timedelta(days=30)
 
     total_anak = Anak.query.count()
 
@@ -46,7 +113,7 @@ def dashboard():
 
     imunisasi_mendatang = Imunisasi.query.filter(
         Imunisasi.tanggal_jadwal > today,
-        Imunisasi.tanggal_jadwal <= next_7,
+        Imunisasi.tanggal_jadwal <= next_30,
         Imunisasi.status == 'terjadwal',
     ).count()
 
@@ -275,6 +342,140 @@ def detail_anak(anak_id):
         anak=anak,
         imunisasi_list=imunisasi_list,
     )
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Import Data Anak
+# ─────────────────────────────────────────────────────────────────────────────
+
+@anak_bp.route('/import', methods=['GET', 'POST'])
+@master_only
+def import_anak():
+    """Impor data anak dari file CSV atau Excel untuk mempercepat input data petugas."""
+    success_count = 0
+    row_errors = []
+    template_headers = IMPORT_ANAK_HEADERS
+    if request.method == 'POST':
+        file = request.files.get('file')
+        if not file or file.filename == '':
+            flash('File CSV atau Excel wajib dipilih.', 'danger')
+            return render_template('anak/import.html', template_headers=template_headers)
+
+        filename = file.filename.lower()
+        if filename.endswith('.xls'):
+            flash('File Excel lama .xls belum didukung. Simpan ulang sebagai .xlsx, lalu impor kembali.', 'danger')
+            return render_template('anak/import.html', template_headers=template_headers)
+
+        try:
+            fieldnames, rows = _read_import_rows(file)
+        except ValueError:
+            flash('Hanya file CSV atau Excel .xlsx/.xlsm yang diizinkan.', 'danger')
+            return render_template('anak/import.html', template_headers=template_headers)
+        except Exception:
+            flash('Gagal membaca file. Pastikan file CSV/Excel tidak rusak.', 'danger')
+            return render_template('anak/import.html', template_headers=template_headers)
+
+        if not fieldnames:
+            flash('File kosong atau header tidak terdeteksi.', 'danger')
+            return render_template('anak/import.html', template_headers=template_headers)
+
+        headers = [h.strip().lower() for h in fieldnames if h]
+        missing = [h for h in template_headers if h not in headers]
+        if missing:
+            flash(
+                'Header file tidak lengkap. Pastikan header berikut ada: ' + ', '.join(missing),
+                'danger'
+            )
+            return render_template('anak/import.html', template_headers=template_headers)
+
+        for row_index, row in rows:
+            if not any(row.values()):
+                continue
+
+            data = {
+                'nama': row.get('nama', ''),
+                'tanggal_lahir': row.get('tanggal_lahir', ''),
+                'jenis_kelamin': row.get('jenis_kelamin', ''),
+                'nama_ibu': row.get('nama_ibu', ''),
+                'no_hp_ortu': row.get('no_hp_ortu', ''),
+                'alamat': row.get('alamat', ''),
+                'berat_lahir': row.get('berat_lahir', ''),
+                'panjang_lahir': row.get('panjang_lahir', ''),
+            }
+
+            errors = validate_anak_data(data)
+            tanggal_lahir = None
+            if data['tanggal_lahir']:
+                try:
+                    tanggal_lahir = datetime.strptime(data['tanggal_lahir'], '%Y-%m-%d').date()
+                    umur_hari = (date.today() - tanggal_lahir).days
+                    if umur_hari < 0:
+                        errors.append('Tanggal lahir tidak boleh di masa depan.')
+                    elif umur_hari > 730:
+                        errors.append('Aplikasi hanya untuk anak usia 0–2 tahun (maksimal 730 hari).')
+                except ValueError:
+                    errors.append('Format tanggal lahir tidak valid. Gunakan YYYY-MM-DD.')
+
+            if data['jenis_kelamin'] not in ('L', 'P'):
+                errors.append('Jenis kelamin harus L atau P.')
+
+            try:
+                berat_lahir = float(data['berat_lahir']) if data['berat_lahir'] else None
+            except ValueError:
+                errors.append('Berat lahir harus berupa angka.')
+                berat_lahir = None
+
+            try:
+                panjang_lahir = float(data['panjang_lahir']) if data['panjang_lahir'] else None
+            except ValueError:
+                errors.append('Panjang lahir harus berupa angka.')
+                panjang_lahir = None
+
+            if errors:
+                row_errors.append(f'Baris {row_index}: ' + '; '.join(errors))
+                continue
+
+            anak = Anak(
+                nama=data['nama'],
+                tanggal_lahir=tanggal_lahir,
+                jenis_kelamin=data['jenis_kelamin'],
+                nama_ibu=data['nama_ibu'],
+                no_hp_ortu=data['no_hp_ortu'],
+                alamat=data['alamat'] or None,
+                berat_lahir=berat_lahir,
+                panjang_lahir=panjang_lahir,
+                created_by=current_user.id,
+            )
+            db.session.add(anak)
+            db.session.flush()
+
+            try:
+                jadwal_list = generate_jadwal_imunisasi(tanggal_lahir)
+                for jadwal in jadwal_list:
+                    imun = Imunisasi(
+                        anak_id=anak.id,
+                        nama_vaksin=jadwal['nama_vaksin'],
+                        tanggal_jadwal=jadwal['tanggal_jadwal'],
+                        status='terjadwal',
+                    )
+                    db.session.add(imun)
+            except Exception as e:
+                row_errors.append(
+                    f'Baris {row_index}: berhasil menyimpan anak, tetapi gagal membuat jadwal imunisasi otomatis ({e}).'
+                )
+
+            success_count += 1
+
+        if success_count > 0:
+            db.session.commit()
+
+        if success_count:
+            flash(f'{success_count} data anak berhasil diimpor.', 'success')
+        if row_errors:
+            for error in row_errors:
+                flash(error, 'warning')
+
+    return render_template('anak/import.html', template_headers=template_headers)
 
 
 # ─────────────────────────────────────────────────────────────────────────────

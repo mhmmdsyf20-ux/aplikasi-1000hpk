@@ -4,6 +4,7 @@ tests/test_e2e.py — End-to-end smoke tests untuk alur utama aplikasi 1000 HPK.
 Menguji alur: login → tambah anak → cek jadwal terbuat → tandai selesai → cek log.
 """
 
+import io
 from datetime import date, timedelta
 import pytest
 from models import User, Anak, Imunisasi, NotifikasiLog
@@ -122,6 +123,81 @@ class TestE2EAlurUtama:
 
         resp = client.get('/anak/')
         assert resp.status_code == 200
+
+    def test_import_data_anak_csv(self, client, db):
+        """Petugas dapat mengimpor data anak dari file CSV."""
+        create_admin(db)
+        login_as(client, 'admin_e2e', 'adminpass123')
+
+        tgl_lahir = (date.today() - timedelta(days=30)).strftime('%Y-%m-%d')
+        csv_content = (
+            'nama,tanggal_lahir,jenis_kelamin,nama_ibu,no_hp_ortu,alamat,berat_lahir,panjang_lahir\n'
+            f'Bambang,{tgl_lahir},L,Hasan,081234567890,Jalan Kebon,3300,51\n'
+        )
+        resp = client.post(
+            '/anak/import',
+            data={
+                'file': (io.BytesIO(csv_content.encode('utf-8')), 'anak.csv'),
+            },
+            content_type='multipart/form-data',
+            follow_redirects=True,
+        )
+        assert resp.status_code == 200
+        assert '1 data anak berhasil diimpor.' in resp.get_data(as_text=True)
+
+        anak = Anak.query.filter_by(nama='Bambang').first()
+        assert anak is not None
+        assert len(anak.imunisasi_list) == len(JADWAL_IDAI)
+
+    def test_import_data_anak_excel(self, client, db):
+        """Petugas dapat mengimpor data anak dari file Excel .xlsx."""
+        import openpyxl
+
+        create_admin(db)
+        login_as(client, 'admin_e2e', 'adminpass123')
+
+        tgl_lahir = date.today() - timedelta(days=45)
+        workbook = openpyxl.Workbook()
+        sheet = workbook.active
+        sheet.append([
+            'nama',
+            'tanggal_lahir',
+            'jenis_kelamin',
+            'nama_ibu',
+            'no_hp_ortu',
+            'alamat',
+            'berat_lahir',
+            'panjang_lahir',
+        ])
+        sheet.append([
+            'Sinta',
+            tgl_lahir,
+            'P',
+            'Dewi',
+            '081234567891',
+            'Jalan Melati',
+            3100,
+            49,
+        ])
+        excel_file = io.BytesIO()
+        workbook.save(excel_file)
+        excel_file.seek(0)
+
+        resp = client.post(
+            '/anak/import',
+            data={
+                'file': (excel_file, 'anak.xlsx'),
+            },
+            content_type='multipart/form-data',
+            follow_redirects=True,
+        )
+        assert resp.status_code == 200
+        assert '1 data anak berhasil diimpor.' in resp.get_data(as_text=True)
+
+        anak = Anak.query.filter_by(nama='Sinta').first()
+        assert anak is not None
+        assert anak.tanggal_lahir == tgl_lahir
+        assert len(anak.imunisasi_list) == len(JADWAL_IDAI)
 
     def test_api_chart_status_mengembalikan_json(self, client, db):
         """Endpoint /anak/api/chart/status mengembalikan JSON yang valid."""

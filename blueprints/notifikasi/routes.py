@@ -4,7 +4,7 @@ blueprints/notifikasi/routes.py — Route notifikasi WhatsApp.
 Routes:
     GET  /notifikasi/              — Daftar anak dengan jadwal mendatang + riwayat log
     POST /notifikasi/kirim/<id>    — Kirim notifikasi ke satu anak
-    POST /notifikasi/kirim-semua   — Kirim ke semua anak dengan jadwal 7 hari ke depan
+    POST /notifikasi/kirim-semua   — Kirim ke semua anak dengan jadwal 30 hari ke depan
 """
 
 from flask import render_template, redirect, url_for, flash, request, jsonify, current_app
@@ -25,7 +25,7 @@ def index():
     # Update status terlewat setiap kali halaman dibuka
     update_status_terlewat()
 
-    mendatang = get_imunisasi_mendatang(days=7)
+    mendatang = get_imunisasi_mendatang(days=30)
 
     # Ambil semua imunisasi terlewat
     terlewat = (
@@ -57,7 +57,7 @@ def kirim_notifikasi(anak_id):
     anak = Anak.query.get_or_404(anak_id)
 
     # Ambil imunisasi mendatang untuk anak ini
-    mendatang = get_imunisasi_mendatang(days=7)
+    mendatang = get_imunisasi_mendatang(days=30)
     imunisasi_anak = [i for i in mendatang if i.anak_id == anak_id]
 
     if not imunisasi_anak:
@@ -87,11 +87,11 @@ def kirim_notifikasi(anak_id):
 @notifikasi_bp.route("/kirim-semua", methods=["POST"])
 @master_only
 def kirim_semua():
-    """Kirim notifikasi WhatsApp ke semua anak dengan jadwal imunisasi dalam 7 hari ke depan."""
-    mendatang = get_imunisasi_mendatang(days=7)
+    """Kirim notifikasi WhatsApp ke semua anak dengan jadwal imunisasi dalam 30 hari ke depan."""
+    mendatang = get_imunisasi_mendatang(days=30)
 
     if not mendatang:
-        flash("Tidak ada jadwal imunisasi mendatang dalam 7 hari ke depan.", "info")
+        flash("Tidak ada jadwal imunisasi mendatang dalam 30 hari ke depan.", "info")
         return redirect(url_for("notifikasi.index"))
 
     nama_fasilitas = current_app.config.get("NAMA_FASILITAS", "Puskesmas")

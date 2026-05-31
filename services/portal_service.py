@@ -172,8 +172,8 @@ def kelompokkan_jadwal(jadwal_list: list[Any], today: date) -> dict[str, list[An
     Pure function — tidak mengakses database.
 
     Kategori pengelompokan:
-    - ``mendatang``: status == 'terjadwal' DAN ``today <= tanggal_jadwal <= today + 7 hari``
-    - ``terjadwal``: status == 'terjadwal' DAN ``tanggal_jadwal > today + 7 hari``
+    - ``mendatang``: status == 'terjadwal' DAN ``today <= tanggal_jadwal <= today + 30 hari``
+    - ``terjadwal``: status == 'terjadwal' DAN ``tanggal_jadwal > today + 30 hari``
     - ``riwayat``:   status == 'selesai' ATAU status == 'terlewat' ATAU
                      (status == 'terjadwal' DAN ``tanggal_jadwal < today``)
 
@@ -204,7 +204,7 @@ def kelompokkan_jadwal(jadwal_list: list[Any], today: date) -> dict[str, list[An
         >>> result['riwayat'] == [j3]
         True
     """
-    batas_mendatang = today + timedelta(days=7)
+    batas_mendatang = today + timedelta(days=30)
 
     mendatang: list[Any] = []
     terjadwal: list[Any] = []
@@ -342,8 +342,8 @@ def get_jadwal_anak(anak_id: int, user_id: int) -> dict:
     Returns:
         Dict dengan kunci:
         - ``anak``      : Objek ``Anak``
-        - ``mendatang`` : List jadwal terjadwal dalam 7 hari ke depan
-        - ``terjadwal`` : List jadwal terjadwal lebih dari 7 hari ke depan
+        - ``mendatang`` : List jadwal terjadwal dalam 30 hari ke depan
+        - ``terjadwal`` : List jadwal terjadwal lebih dari 30 hari ke depan
         - ``riwayat``   : List jadwal selesai atau terlewat
         - ``total``     : Total jumlah jadwal (int)
         - ``selesai``   : Jumlah jadwal berstatus selesai (int)
@@ -429,7 +429,7 @@ def get_dashboard_stats(user_id: int) -> dict:
     Hitung statistik dashboard untuk ibu.
 
     Mengumpulkan data agregat dari semua anak milik ibu: total anak,
-    total jadwal selesai/mendatang/terlewat, jadwal mendatang dalam 7 hari,
+    total jadwal selesai/mendatang/terlewat, jadwal mendatang dalam 30 hari,
     dan progress imunisasi per anak.
 
     Args:
@@ -439,9 +439,9 @@ def get_dashboard_stats(user_id: int) -> dict:
         Dict dengan kunci:
         - ``total_anak``      : Jumlah anak milik ibu (int)
         - ``total_selesai``   : Total jadwal berstatus selesai dari semua anak (int)
-        - ``total_mendatang`` : Total jadwal terjadwal dalam 7 hari ke depan (int)
+        - ``total_mendatang`` : Total jadwal terjadwal dalam 30 hari ke depan (int)
         - ``total_terlewat``  : Total jadwal berstatus terlewat dari semua anak (int)
-        - ``jadwal_mendatang``: List jadwal terjadwal dalam 7 hari ke depan
+        - ``jadwal_mendatang``: List jadwal terjadwal dalam 30 hari ke depan
         - ``anak_progress``   : List dict ``{'anak': Anak, 'total': int, 'selesai': int, 'persen': float}``
 
         Mengembalikan dict dengan nilai 0/[] jika terjadi error database.
@@ -465,7 +465,7 @@ def get_dashboard_stats(user_id: int) -> dict:
         anak_list = Anak.query.filter_by(created_by=user_id).order_by(Anak.nama).all()
 
         today = date.today()
-        batas_mendatang = today + timedelta(days=7)
+        batas_mendatang = today + timedelta(days=30)
 
         total_selesai = 0
         total_mendatang = 0

@@ -1,0 +1,65 @@
+{% extends 'base.html' %} {% block title %}Impor Data Anak{% endblock %} {%
+block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h4 class="fw-bold mb-0">
+      <i class="bi bi-upload me-2 text-primary"></i>Impor Data Anak
+    </h4>
+    <p class="mb-0 text-muted">
+      Unggah file CSV atau Excel untuk memasukkan banyak data anak sekaligus.
+    </p>
+  </div>
+  <a href="{{ url_for('anak.list_anak') }}" class="btn btn-outline-secondary">
+    <i class="bi bi-arrow-left me-1"></i>Kembali ke Daftar Anak
+  </a>
+</div>
+
+<div class="card border-0 shadow-sm">
+  <div class="card-body p-4">
+    <form
+      method="POST"
+      action="{{ url_for('anak.import_anak') }}"
+      enctype="multipart/form-data"
+    >
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+      <div class="mb-4">
+        <label for="file" class="form-label fw-semibold"
+          >File CSV / Excel <span class="text-danger">*</span></label
+        >
+        <input
+          type="file"
+          id="file"
+          name="file"
+          class="form-control"
+          accept=".csv,.xlsx,.xlsm"
+          required
+        />
+        <div class="form-text">
+          Format yang didukung: CSV, Excel .xlsx, atau .xlsm. Untuk Excel,
+          gunakan sheet pertama dan isi header di baris pertama.
+        </div>
+      </div>
+      <div class="mb-4">
+        <h6 class="fw-semibold">Header yang dibutuhkan</h6>
+        <p class="small text-muted mb-2">
+          Urutan header tidak penting, tetapi nama field harus tepat.
+        </p>
+        <div class="bg-white rounded p-3 border">
+          <code>{{ template_headers | join(', ') }}</code>
+        </div>
+        <div class="form-text mt-2">
+          Contoh baris data:
+          <code>Rizky,2024-01-01,L,Sri,081234567890,Jalan Mawar,3200,50</code>
+        </div>
+        <div class="form-text mt-2">
+          Tanggal lahir gunakan format <code>YYYY-MM-DD</code>, atau pakai
+          tipe tanggal bawaan Excel.
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary">
+        <i class="bi bi-upload me-1"></i>Mulai Impor
+      </button>
+    </form>
+  </div>
+</div>
+{% endblock %}

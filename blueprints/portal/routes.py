@@ -257,7 +257,7 @@ def portal_jadwal_anak(anak_id):
     Halaman jadwal imunisasi anak.
 
     Menampilkan jadwal imunisasi yang dikelompokkan ke dalam tiga kategori:
-    mendatang (7 hari ke depan), terjadwal (lebih dari 7 hari), dan riwayat.
+    mendatang (30 hari ke depan), terjadwal (lebih dari 30 hari), dan riwayat.
     Mengembalikan 403 jika anak bukan milik ibu yang sedang login.
     """
     data = get_jadwal_anak(anak_id, current_user.id)

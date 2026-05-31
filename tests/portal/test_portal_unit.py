@@ -122,7 +122,7 @@ def _buat_jadwal(delta_hari: int, status: str):
 
 
 def test_kelompokkan_jadwal_mendatang():
-    """Jadwal terjadwal H+3 (dalam 7 hari) masuk kategori mendatang."""
+    """Jadwal terjadwal H+3 (dalam 30 hari) masuk kategori mendatang."""
     today = date.today()
     jadwal = types.SimpleNamespace(
         tanggal_jadwal=today + timedelta(days=3),
@@ -135,10 +135,10 @@ def test_kelompokkan_jadwal_mendatang():
 
 
 def test_kelompokkan_jadwal_terjadwal():
-    """Jadwal terjadwal H+10 (lebih dari 7 hari) masuk kategori terjadwal."""
+    """Jadwal terjadwal H+40 (lebih dari 30 hari) masuk kategori terjadwal."""
     today = date.today()
     jadwal = types.SimpleNamespace(
-        tanggal_jadwal=today + timedelta(days=10),
+        tanggal_jadwal=today + timedelta(days=40),
         status='terjadwal',
     )
     result = kelompokkan_jadwal([jadwal], today)

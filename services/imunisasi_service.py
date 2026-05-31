@@ -25,6 +25,8 @@ JADWAL_IDAI = [
     {"nama_vaksin": "Tifoid",         "offset_hari": 730},
 ]
 
+DEFAULT_MENDATANG_DAYS = 30
+
 
 def generate_jadwal_imunisasi(tanggal_lahir: date) -> list:
     """
@@ -73,7 +75,7 @@ def update_status_terlewat() -> int:
     return count
 
 
-def get_imunisasi_mendatang(days: int = 7) -> list:
+def get_imunisasi_mendatang(days: int = DEFAULT_MENDATANG_DAYS) -> list:
     """
     Ambil semua imunisasi 'terjadwal' yang jatuh tempo antara hari ini dan hari ini + days.
     """
