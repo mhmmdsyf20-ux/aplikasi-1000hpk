@@ -293,6 +293,8 @@ def edit_anak(anak_id):
                                    today=date.today().strftime('%Y-%m-%d'),
                                    min_date=(date.today() - timedelta(days=730)).strftime('%Y-%m-%d'))
 
+        tanggal_lahir_lama = anak.tanggal_lahir
+
         anak.nama = data['nama']
         anak.tanggal_lahir = tanggal_lahir
         anak.jenis_kelamin = data['jenis_kelamin']
@@ -301,6 +303,26 @@ def edit_anak(anak_id):
         anak.alamat = data['alamat'] or None
         anak.berat_lahir = float(data['berat_lahir']) if data['berat_lahir'] else None
         anak.panjang_lahir = float(data['panjang_lahir']) if data['panjang_lahir'] else None
+
+        # Jika tanggal lahir berubah, hapus jadwal lama dan buat ulang
+        if tanggal_lahir and tanggal_lahir != tanggal_lahir_lama:
+            # Hapus hanya jadwal yang belum selesai
+            Imunisasi.query.filter_by(anak_id=anak.id).filter(
+                Imunisasi.status.in_(['terjadwal', 'terlewat'])
+            ).delete()
+            try:
+                jadwal_list = generate_jadwal_imunisasi(tanggal_lahir)
+                for jadwal in jadwal_list:
+                    imun = Imunisasi(
+                        anak_id=anak.id,
+                        nama_vaksin=jadwal['nama_vaksin'],
+                        tanggal_jadwal=jadwal['tanggal_jadwal'],
+                        status='terjadwal',
+                    )
+                    db.session.add(imun)
+                flash('Jadwal imunisasi diperbarui sesuai tanggal lahir baru.', 'info')
+            except Exception as e:
+                flash(f'Peringatan: Gagal memperbarui jadwal imunisasi. {e}', 'warning')
 
         db.session.commit()
         flash(f'Data anak "{anak.nama}" berhasil diperbarui.', 'success')

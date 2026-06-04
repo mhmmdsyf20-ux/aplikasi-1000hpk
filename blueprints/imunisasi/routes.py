@@ -107,6 +107,11 @@ def tandai_imunisasi_selesai(imunisasi_id):
         db.session.commit()
 
     flash(f"Imunisasi {imunisasi.nama_vaksin} berhasil ditandai selesai.", "success")
+
+    # Redirect kembali ke halaman asal (list atau detail anak)
+    referrer = request.referrer or ''
+    if 'imunisasi' in referrer:
+        return redirect(url_for("imunisasi.list_imunisasi"))
     return redirect(url_for("anak.detail_anak", anak_id=imunisasi.anak_id))
 
 

@@ -121,46 +121,15 @@
                         </td>
                         <td>
                             {% if imun.status != 'selesai' %}
-                            <button type="button" class="btn btn-sm btn-success"
-                                    data-bs-toggle="modal" data-bs-target="#modalSelesai{{ imun.id }}">
+                            <button type="button" class="btn btn-sm btn-success btn-tandai-selesai"
+                                    data-imun-id="{{ imun.id }}"
+                                    data-vaksin="{{ imun.nama_vaksin }}"
+                                    data-anak="{{ imun.anak.nama }}"
+                                    data-jadwal="{{ imun.tanggal_jadwal.strftime('%d %b %Y') }}"
+                                    data-jadwal-iso="{{ imun.tanggal_jadwal.strftime('%Y-%m-%d') }}"
+                                    data-action="{{ url_for('imunisasi.tandai_imunisasi_selesai', imunisasi_id=imun.id) }}">
                                 <i class="bi bi-check-circle me-1"></i>Tandai Selesai
                             </button>
-                            <!-- Modal -->
-                            <div class="modal fade" id="modalSelesai{{ imun.id }}" tabindex="-1">
-                                <div class="modal-dialog">
-                                    <div class="modal-content" style="background:var(--gg-surface);border:1px solid var(--gg-border)">
-                                        <div class="modal-header" style="border-color:var(--gg-border)">
-                                            <h5 class="modal-title">Tandai Selesai: {{ imun.nama_vaksin }}</h5>
-                                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                                        </div>
-                                        <form method="POST" action="{{ url_for('imunisasi.tandai_imunisasi_selesai', imunisasi_id=imun.id) }}">
-                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                            <div class="modal-body">
-                                                <p class="small" style="color:var(--gg-muted)">
-                                                    Anak: <strong>{{ imun.anak.nama }}</strong> |
-                                                    Jadwal: <strong>{{ imun.tanggal_jadwal.strftime('%d %b %Y') }}</strong>
-                                                </p>
-                                                <div class="mb-3">
-                                                    <label class="form-label fw-semibold">Tanggal Realisasi <span class="text-danger">*</span></label>
-                                                    <input type="date" name="tanggal_realisasi" class="form-control"
-                                                           value="{{ imun.tanggal_jadwal.strftime('%Y-%m-%d') }}" required>
-                                                </div>
-                                                <div class="mb-3">
-                                                    <label class="form-label fw-semibold">Catatan</label>
-                                                    <textarea name="catatan" class="form-control" rows="2"
-                                                              placeholder="Catatan tambahan (opsional)"></textarea>
-                                                </div>
-                                            </div>
-                                            <div class="modal-footer" style="border-color:var(--gg-border)">
-                                                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
-                                                <button type="submit" class="btn btn-success">
-                                                    <i class="bi bi-check-circle me-1"></i>Simpan
-                                                </button>
-                                            </div>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
                             {% else %}
                             <span class="text-muted small">—</span>
                             {% endif %}
@@ -178,4 +147,57 @@
         {% endif %}
     </div>
 </div>
+
+<!-- Modal Tandai Selesai (shared, diisi dinamis) -->
+<div class="modal fade" id="modalSelesaiShared" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content" style="background:var(--gg-surface);border:1px solid var(--gg-border)">
+            <div class="modal-header" style="border-color:var(--gg-border)">
+                <h5 class="modal-title" id="modalSelesaiTitle">Tandai Selesai</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" id="formSelesai" action="">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <div class="modal-body">
+                    <p class="small" style="color:var(--gg-muted)" id="modalSelesaiInfo"></p>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Tanggal Realisasi <span class="text-danger">*</span></label>
+                        <input type="date" name="tanggal_realisasi" id="inputTanggalRealisasi" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Catatan</label>
+                        <textarea name="catatan" class="form-control" rows="2" placeholder="Catatan tambahan (opsional)"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer" style="border-color:var(--gg-border)">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-success">
+                        <i class="bi bi-check-circle me-1"></i>Simpan
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+document.querySelectorAll('.btn-tandai-selesai').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+        var vaksin = this.dataset.vaksin;
+        var anak = this.dataset.anak;
+        var jadwal = this.dataset.jadwal;
+        var jadwalIso = this.dataset.jadwalIso;
+        var action = this.dataset.action;
+
+        document.getElementById('modalSelesaiTitle').textContent = 'Tandai Selesai: ' + vaksin;
+        document.getElementById('modalSelesaiInfo').innerHTML =
+            'Anak: <strong>' + anak + '</strong> | Jadwal: <strong>' + jadwal + '</strong>';
+        document.getElementById('inputTanggalRealisasi').value = jadwalIso;
+        document.getElementById('formSelesai').action = action;
+
+        var modal = new bootstrap.Modal(document.getElementById('modalSelesaiShared'));
+        modal.show();
+    });
+});
+</script>
 {% endblock %}
