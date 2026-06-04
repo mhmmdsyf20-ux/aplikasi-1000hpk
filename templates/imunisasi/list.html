@@ -149,17 +149,17 @@
 </div>
 
 <!-- Modal Tandai Selesai (shared, diisi dinamis) -->
-<div class="modal fade" id="modalSelesaiShared" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content" style="background:var(--gg-surface);border:1px solid var(--gg-border)">
-            <div class="modal-header" style="border-color:var(--gg-border)">
+<div class="modal fade" id="modalSelesaiShared" tabindex="-1" aria-hidden="true" style="z-index:1055">
+    <div class="modal-dialog" style="z-index:1056">
+        <div class="modal-content">
+            <div class="modal-header">
                 <h5 class="modal-title" id="modalSelesaiTitle">Tandai Selesai</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <form method="POST" id="formSelesai" action="">
+            <form method="POST" id="formSelesai" action="#">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <div class="modal-body">
-                    <p class="small" style="color:var(--gg-muted)" id="modalSelesaiInfo"></p>
+                    <p class="small text-muted" id="modalSelesaiInfo"></p>
                     <div class="mb-3">
                         <label class="form-label fw-semibold">Tanggal Realisasi <span class="text-danger">*</span></label>
                         <input type="date" name="tanggal_realisasi" id="inputTanggalRealisasi" class="form-control" required>
@@ -169,8 +169,8 @@
                         <textarea name="catatan" class="form-control" rows="2" placeholder="Catatan tambahan (opsional)"></textarea>
                     </div>
                 </div>
-                <div class="modal-footer" style="border-color:var(--gg-border)">
-                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
                     <button type="submit" class="btn btn-success">
                         <i class="bi bi-check-circle me-1"></i>Simpan
                     </button>
