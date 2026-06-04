@@ -13,7 +13,7 @@ import csv
 import io
 from datetime import date, timedelta, datetime
 
-from flask import render_template, redirect, url_for, flash, request
+from flask import render_template, redirect, url_for, flash, request, current_app
 from flask_login import current_user
 
 from blueprints.anak import anak_bp
@@ -68,7 +68,8 @@ def _read_import_rows(file):
     if filename.endswith(('.xlsx', '.xlsm')):
         from openpyxl import load_workbook
 
-        workbook = load_workbook(file.stream, read_only=True, data_only=True)
+        file_bytes = file.read()
+        workbook = load_workbook(io.BytesIO(file_bytes), read_only=True, data_only=True)
         sheet = workbook.active
         row_values = sheet.iter_rows(values_only=True)
         header_row = next(row_values, None)
@@ -371,8 +372,9 @@ def import_anak():
         except ValueError:
             flash('Hanya file CSV atau Excel .xlsx/.xlsm yang diizinkan.', 'danger')
             return render_template('anak/import.html', template_headers=template_headers)
-        except Exception:
-            flash('Gagal membaca file. Pastikan file CSV/Excel tidak rusak.', 'danger')
+        except Exception as e:
+            current_app.logger.error(f"Error importing child data file: {e}", exc_info=True)
+            flash(f'Gagal membaca file: {str(e)}. Pastikan file CSV/Excel tidak rusak.', 'danger')
             return render_template('anak/import.html', template_headers=template_headers)
 
         if not fieldnames:
@@ -392,18 +394,44 @@ def import_anak():
             if not any(row.values()):
                 continue
 
+            # ── Normalisasi jenis_kelamin ──────────────────────────────────
+            jk_raw = row.get('jenis_kelamin', '').strip()
+            jk_map = {
+                'l': 'L', 'laki-laki': 'L', 'laki laki': 'L', 'male': 'L',
+                'p': 'P', 'perempuan': 'P', 'wanita': 'P', 'female': 'P',
+            }
+            jenis_kelamin = jk_map.get(jk_raw.lower(), jk_raw.upper() if jk_raw.upper() in ('L', 'P') else '')
+
+            # ── Normalisasi no_hp_ortu ─────────────────────────────────────
+            no_hp_raw = row.get('no_hp_ortu', '').strip()
+            # Ganti karakter tidak valid: -, _, spasi dalam konteks placeholder
+            if no_hp_raw in ('-', '_', '', 'n/a', 'na', '-'):
+                no_hp_ortu = '000000000000'
+            else:
+                # Bersihkan karakter non-digit kecuali + di awal
+                import re as _re
+                no_hp_clean = _re.sub(r'[\s\-\u2011\u2012\u2013]', '', no_hp_raw)
+                # Konversi +62 ke 0
+                if no_hp_clean.startswith('+62'):
+                    no_hp_clean = '0' + no_hp_clean[3:]
+                no_hp_ortu = no_hp_clean if no_hp_clean else '000000000000'
+
             data = {
                 'nama': row.get('nama', ''),
                 'tanggal_lahir': row.get('tanggal_lahir', ''),
-                'jenis_kelamin': row.get('jenis_kelamin', ''),
-                'nama_ibu': row.get('nama_ibu', ''),
-                'no_hp_ortu': row.get('no_hp_ortu', ''),
+                'jenis_kelamin': jenis_kelamin,
+                'nama_ibu': row.get('nama_ibu', '') or '-',
+                'no_hp_ortu': no_hp_ortu,
                 'alamat': row.get('alamat', ''),
                 'berat_lahir': row.get('berat_lahir', ''),
                 'panjang_lahir': row.get('panjang_lahir', ''),
             }
 
-            errors = validate_anak_data(data)
+            errors = []
+            if not data['nama']:
+                errors.append('Nama wajib diisi.')
+
+            # ── Tanggal lahir: kosong → pakai hari ini sebagai fallback ───
             tanggal_lahir = None
             if data['tanggal_lahir']:
                 try:
@@ -415,9 +443,12 @@ def import_anak():
                         errors.append('Aplikasi hanya untuk anak usia 0–2 tahun (maksimal 730 hari).')
                 except ValueError:
                     errors.append('Format tanggal lahir tidak valid. Gunakan YYYY-MM-DD.')
+            else:
+                # Tanggal lahir kosong — gunakan hari ini (perlu diisi manual nanti)
+                tanggal_lahir = date.today()
 
-            if data['jenis_kelamin'] not in ('L', 'P'):
-                errors.append('Jenis kelamin harus L atau P.')
+            if jenis_kelamin not in ('L', 'P'):
+                errors.append(f'Jenis kelamin "{jk_raw}" tidak dikenali. Gunakan L/P atau Laki-Laki/Perempuan.')
 
             try:
                 berat_lahir = float(data['berat_lahir']) if data['berat_lahir'] else None
@@ -438,9 +469,9 @@ def import_anak():
             anak = Anak(
                 nama=data['nama'],
                 tanggal_lahir=tanggal_lahir,
-                jenis_kelamin=data['jenis_kelamin'],
+                jenis_kelamin=jenis_kelamin,
                 nama_ibu=data['nama_ibu'],
-                no_hp_ortu=data['no_hp_ortu'],
+                no_hp_ortu=no_hp_ortu,
                 alamat=data['alamat'] or None,
                 berat_lahir=berat_lahir,
                 panjang_lahir=panjang_lahir,
