@@ -121,15 +121,14 @@
                         </td>
                         <td>
                             {% if imun.status != 'selesai' %}
-                            <button type="button" class="btn btn-sm btn-success btn-tandai-selesai"
-                                    data-imun-id="{{ imun.id }}"
-                                    data-vaksin="{{ imun.nama_vaksin }}"
-                                    data-anak="{{ imun.anak.nama }}"
-                                    data-jadwal="{{ imun.tanggal_jadwal.strftime('%d %b %Y') }}"
-                                    data-jadwal-iso="{{ imun.tanggal_jadwal.strftime('%Y-%m-%d') }}"
-                                    data-action="{{ url_for('imunisasi.tandai_imunisasi_selesai', imunisasi_id=imun.id) }}">
-                                <i class="bi bi-check-circle me-1"></i>Tandai Selesai
-                            </button>
+                            <form method="POST" action="{{ url_for('imunisasi.tandai_imunisasi_selesai', imunisasi_id=imun.id) }}" style="display:inline">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <input type="hidden" name="tanggal_realisasi" value="{{ imun.tanggal_jadwal.strftime('%Y-%m-%d') }}">
+                                <button type="submit" class="btn btn-sm btn-success"
+                                        onclick="return confirm('Tandai imunisasi {{ imun.nama_vaksin }} untuk {{ imun.anak.nama }} sebagai selesai?')">
+                                    <i class="bi bi-check-circle me-1"></i>Selesai
+                                </button>
+                            </form>
                             {% else %}
                             <span class="text-muted small">—</span>
                             {% endif %}
@@ -148,59 +147,6 @@
     </div>
 </div>
 
-<!-- Modal Tandai Selesai (shared, diisi dinamis) -->
-<div class="modal fade" id="modalSelesaiShared" tabindex="-1" aria-hidden="true" style="z-index:1055">
-    <div class="modal-dialog" style="z-index:1056">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="modalSelesaiTitle">Tandai Selesai</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <form method="POST" id="formSelesai" action="#">
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                <div class="modal-body">
-                    <p class="small text-muted" id="modalSelesaiInfo"></p>
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold">Tanggal Realisasi <span class="text-danger">*</span></label>
-                        <input type="date" name="tanggal_realisasi" id="inputTanggalRealisasi" class="form-control" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold">Catatan</label>
-                        <textarea name="catatan" class="form-control" rows="2" placeholder="Catatan tambahan (opsional)"></textarea>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-success">
-                        <i class="bi bi-check-circle me-1"></i>Simpan
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
 {% endblock %}
 
-{% block extra_scripts %}
-<script>
-document.querySelectorAll('.btn-tandai-selesai').forEach(function(btn) {
-    btn.addEventListener('click', function() {
-        var vaksin = this.dataset.vaksin;
-        var anak = this.dataset.anak;
-        var jadwal = this.dataset.jadwal;
-        var jadwalIso = this.dataset.jadwalIso;
-        var action = this.dataset.action;
-
-        document.getElementById('modalSelesaiTitle').textContent = 'Tandai Selesai: ' + vaksin;
-        document.getElementById('modalSelesaiInfo').innerHTML =
-            'Anak: <strong>' + anak + '</strong> | Jadwal: <strong>' + jadwal + '</strong>';
-        document.getElementById('inputTanggalRealisasi').value = jadwalIso;
-        document.getElementById('formSelesai').action = action;
-
-        var modal = new bootstrap.Modal(document.getElementById('modalSelesaiShared'));
-        modal.show();
-    });
-});
-</script>
-{% endblock %}
+{% block extra_scripts %}{% endblock %}
